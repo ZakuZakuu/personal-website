@@ -1,0 +1,46 @@
+---
+import ContentCard from '@/components/ContentCard.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getTagIndex, getWriting, type WritingEntry } from '@/lib/content';
+import { slugifyTag } from '@/lib/text';
+
+export async function getStaticPaths() {
+  const writing = await getWriting();
+  return getTagIndex(writing).map((tag) => ({
+    params: { tag: tag.slug },
+    props: {
+      label: tag.label,
+      entries: writing.filter((entry) =>
+        entry.data.tags.some((candidate) => slugifyTag(candidate) === tag.slug),
+      ),
+    },
+  }));
+}
+
+interface Props {
+  label: string;
+  entries: WritingEntry[];
+}
+const { label, entries } = Astro.props;
+---
+
+<BaseLayout
+  title={`Writing tagged ${label}`}
+  description={`Articles and notes tagged ${label}.`}
+>
+  <PageHeader
+    eyebrow="Tag"
+    title={label}
+    lede={`${entries.length} ${entries.length === 1 ? 'entry follows' : 'entries follow'} this thread.`}
+  />
+  <section class="shell entries" aria-label={`Writing tagged ${label}`}>
+    {entries.map((entry) => <ContentCard entry={entry} />)}
+  </section>
+</BaseLayout>
+
+<style>
+  .entries {
+    max-width: 55rem;
+  }
+</style>

@@ -1,0 +1,34 @@
+---
+import CourseCard from '@/components/CourseCard.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import { getCourses, getCourseNotes } from '@/lib/content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const courses = await getCourses();
+const coursesWithCounts = await Promise.all(
+  courses.map(async (course) => ({
+    course,
+    noteCount: (await getCourseNotes(course.id)).length,
+  })),
+);
+---
+
+<BaseLayout
+  title="Courses"
+  description="Ordered learning paths assembled from the same notes that appear across the site."
+>
+  <PageHeader
+    eyebrow="Courses"
+    title="Learning paths, not duplicate folders."
+    lede="Courses provide sequence and context. Every lesson remains a normal note, connected here through typed metadata."
+  />
+  <section class="shell course-list" aria-label="Courses">
+    {coursesWithCounts.map(({ course, noteCount }) => <CourseCard {course} {noteCount} />)}
+  </section>
+</BaseLayout>
+
+<style>
+  .course-list {
+    max-width: 55rem;
+  }
+</style>

@@ -1,0 +1,83 @@
+---
+import ContentCard from '@/components/ContentCard.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import { getWriting } from '@/lib/content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const writing = await getWriting();
+const articles = writing.filter((entry) => entry.collection === 'articles');
+const notes = writing.filter((entry) => entry.collection === 'notes');
+---
+
+<BaseLayout
+  title="Writing"
+  description="Articles and focused notes about technical ideas, systems, and ongoing learning."
+>
+  <PageHeader
+    eyebrow="Writing"
+    title="Ideas, at two resolutions."
+    lede="Articles connect several ideas into a considered argument. Notes preserve one useful question or change in understanding."
+  >
+    <nav class="section-links" aria-label="Writing sections">
+      <a href="#articles">Articles <span>{articles.length}</span></a><a href="#notes"
+        >Notes <span>{notes.length}</span></a
+      ><a href="/tags/">Browse tags</a><a href="/search/">Search</a>
+    </nav>
+  </PageHeader>
+  <div class="shell writing-grid">
+    <section id="articles" aria-labelledby="articles-title">
+      <div class="section-heading">
+        <p class="eyebrow">Long-form</p><h2 id="articles-title">Articles</h2>
+      </div>
+      <div>{articles.map((entry) => <ContentCard entry={entry} />)}</div>
+    </section>
+    <section id="notes" aria-labelledby="notes-title">
+      <div class="section-heading">
+        <p class="eyebrow">Working understanding</p><h2 id="notes-title">Notes</h2>
+      </div>
+      <div>{notes.map((entry) => <ContentCard entry={entry} />)}</div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .section-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem 1.4rem;
+    margin-top: 2rem;
+  }
+  .section-links a {
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  .section-links a:hover {
+    color: var(--accent);
+  }
+  .section-links span {
+    color: var(--line-strong);
+  }
+  .writing-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.8fr);
+    gap: clamp(3rem, 8vw, 8rem);
+  }
+  .section-heading {
+    min-height: 7rem;
+  }
+  h2 {
+    margin: 0.45rem 0 0;
+    font-family: ui-serif, Georgia, serif;
+    font-size: 2.15rem;
+    font-weight: 540;
+    letter-spacing: -0.04em;
+  }
+  @media (max-width: 50rem) {
+    .writing-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

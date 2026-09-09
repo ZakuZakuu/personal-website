@@ -51,6 +51,7 @@ const socialImage = new URL(image, Astro.site);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <slot name="head" />
     <script is:inline>
       (() => {
         const saved = localStorage.getItem('theme');
@@ -62,7 +63,7 @@ const socialImage = new URL(image, Astro.site);
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <SiteHeader />
-    <main id="main-content">
+    <main id="main-content" data-pagefind-body>
       <slot />
     </main>
     <SiteFooter />

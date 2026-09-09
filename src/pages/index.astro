@@ -1,26 +1,97 @@
 ---
+import ContentCard from '@/components/ContentCard.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getProjects, getWriting } from '@/lib/content';
+
+const [writing, projects] = await Promise.all([getWriting(), getProjects()]);
+const featuredWriting = writing.filter((entry) => entry.data.featured).slice(0, 2);
+const featuredProjects = projects.filter((entry) => entry.data.featured).slice(0, 2);
+const recentNotes = writing.filter((entry) => entry.collection === 'notes').slice(0, 3);
 ---
 
 <BaseLayout>
-  <div class="shell hero">
-    <p class="eyebrow">Personal knowledge site · first public build</p>
-    <h1>Hi, I’m Ryan.</h1>
-    <p class="lede">
-      A quiet home for what I’m learning, building, and trying to understand.
-    </p>
-    <p class="placeholder">
-      The content system and complete site experience are being established here.
-    </p>
+  <section class="shell hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Personal knowledge site</p>
+      <h1>Hi, I’m Ryan.</h1>
+      <p class="lede">
+        I learn, build, and write about <em>AI</em>, machine learning, systems, and
+        robotics.
+      </p>
+      <nav aria-label="Introduction links">
+        <a class="primary" href="/writing/"
+          >Explore the writing <span aria-hidden="true">→</span></a
+        >
+        <a href="/about/">About this site</a>
+      </nav>
+    </div>
+    <aside class="hero-index" aria-label="Site contents">
+      <p><span>Index / 01</span><span>Current scope</span></p>
+      <ol>
+        <li><span>Writing</span><strong>{writing.length}</strong></li>
+        <li><span>Projects</span><strong>{projects.length}</strong></li>
+        <li><span>Courses</span><strong>02</strong></li>
+      </ol>
+      <a href="/now/"
+        ><span class="pulse" aria-hidden="true"></span>See what’s happening now</a
+      >
+    </aside>
+  </section>
+  <section class="shell home-section" aria-labelledby="featured-writing-title">
+    <header>
+      <p class="eyebrow">Selected ideas</p><h2 id="featured-writing-title">
+        Featured writing
+      </h2><a href="/writing/">All writing →</a>
+    </header>
+    <div class="writing-list">
+      {featuredWriting.map((entry) => <ContentCard entry={entry} />)}
+    </div>
+  </section>
+  <section class="project-band" aria-labelledby="featured-projects-title">
+    <div class="shell home-section">
+      <header>
+        <p class="eyebrow">Things made</p><h2 id="featured-projects-title">
+          Featured projects
+        </h2><a href="/projects/">All projects →</a>
+      </header>
+      <div class="project-grid">
+        {featuredProjects.map((project) => <ProjectCard {project} />)}
+      </div>
+    </div>
+  </section>
+  <div class="shell lower-grid">
+    <section class="home-section" aria-labelledby="recent-notes-title">
+      <header>
+        <p class="eyebrow">Recently understood</p><h2 id="recent-notes-title">
+          Recent notes
+        </h2>
+      </header>
+      <div>{recentNotes.map((entry) => <ContentCard entry={entry} compact />)}</div>
+    </section>
+    <aside class="now-card">
+      <p class="eyebrow">Now / Sep 2026</p>
+      <h2>A current snapshot, without the feed.</h2>
+      <p>
+        The Now page is ready for a concise account of what is being learned, built, read,
+        and explored.
+      </p>
+      <a href="/now/">Open the current snapshot →</a>
+    </aside>
   </div>
 </BaseLayout>
 
 <style>
   .hero {
-    padding-block: clamp(5rem, 14vw, 10rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(16rem, 0.55fr);
+    gap: clamp(3rem, 8vw, 8rem);
+    align-items: end;
+    min-height: calc(100svh - var(--header-height));
+    padding-block: clamp(4.5rem, 10vw, 8rem);
   }
   h1 {
-    max-width: 12ch;
+    max-width: 10ch;
     margin: 1.1rem 0 0;
     font-size: clamp(3.4rem, 9vw, 7.7rem);
     font-weight: 560;
@@ -35,10 +106,169 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     font-size: clamp(1.35rem, 3vw, 2rem);
     line-height: 1.45;
   }
-  .placeholder {
-    margin-top: 4rem;
+  .lede em {
+    color: var(--ink);
+    font-style: normal;
+  }
+  .hero-copy nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem 1.4rem;
+    align-items: center;
+    margin-top: 2.2rem;
+  }
+  .hero-copy nav a {
+    font-size: 0.82rem;
+    text-decoration: none;
+  }
+  .hero-copy nav .primary {
+    padding: 0.75rem 1rem;
+    border-radius: 0.3rem;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .hero-copy nav .primary:hover {
+    background: var(--accent);
+  }
+  .hero-index {
+    border-top: 1px solid var(--line-strong);
+    font-family: var(--font-mono);
+  }
+  .hero-index > p {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    padding-block: 0.7rem;
+    color: var(--ink-soft);
+    font-size: 0.64rem;
+    text-transform: uppercase;
+  }
+  .hero-index ol {
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--line);
+    list-style: none;
+  }
+  .hero-index li {
+    display: flex;
+    justify-content: space-between;
+    padding-block: 0.85rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.73rem;
+  }
+  .hero-index strong {
+    color: var(--line-strong);
+    font-weight: 500;
+  }
+  .hero-index > a {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 1rem;
+    color: var(--ink-soft);
+    font-size: 0.68rem;
+    text-decoration: none;
+  }
+  .pulse {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+  .home-section {
+    padding-block: clamp(4.5rem, 9vw, 7rem);
+  }
+  .home-section > header {
+    display: grid;
+    grid-template-columns: 1fr 2fr auto;
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 2rem;
+  }
+  .home-section h2,
+  .now-card h2 {
+    margin: 0;
+    font-family: ui-serif, Georgia, serif;
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    font-weight: 530;
+    letter-spacing: -0.045em;
+    line-height: 1.1;
+  }
+  .home-section > header > a {
     color: var(--ink-soft);
     font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  .writing-list,
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3rem;
+  }
+  .project-band {
+    border-block: 1px solid var(--line);
+    background: color-mix(in srgb, var(--paper-raised) 40%, transparent);
+  }
+  .project-grid {
+    gap: 1rem;
+  }
+  .lower-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.6fr);
+    gap: clamp(3rem, 9vw, 9rem);
+    align-items: start;
+  }
+  .lower-grid .home-section > header {
+    display: block;
+  }
+  .lower-grid .home-section > header .eyebrow {
+    margin-bottom: 0.6rem;
+  }
+  .now-card {
+    margin-top: clamp(4.5rem, 9vw, 7rem);
+    padding: 1.45rem;
+    border: 1px solid var(--line);
+    border-radius: 0.45rem;
+    background: var(--paper-raised);
+  }
+  .now-card h2 {
+    margin-top: 1.8rem;
+    font-size: 1.65rem;
+  }
+  .now-card > p:not(.eyebrow) {
+    margin: 0.9rem 0 1.4rem;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    line-height: 1.65;
+  }
+  .now-card a {
+    color: var(--accent);
     font-size: 0.75rem;
+    text-decoration: none;
+  }
+  @media (max-width: 48rem) {
+    .hero,
+    .lower-grid {
+      grid-template-columns: 1fr;
+    }
+    .hero {
+      min-height: auto;
+    }
+    .writing-list,
+    .project-grid {
+      grid-template-columns: 1fr;
+    }
+    .home-section > header {
+      grid-template-columns: 1fr auto;
+    }
+    .home-section > header .eyebrow {
+      grid-column: 1 / -1;
+    }
+    .now-card {
+      margin-top: 0;
+    }
   }
 </style>

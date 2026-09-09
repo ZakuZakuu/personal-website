@@ -1,0 +1,35 @@
+---
+import PageHeader from '@/components/PageHeader.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import { getProjects } from '@/lib/content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const projects = await getProjects();
+---
+
+<BaseLayout
+  title="Projects"
+  description="Project case studies covering architecture, trade-offs, failures, and and lessons."
+>
+  <PageHeader
+    eyebrow="Projects"
+    title="Built things, with the decisions left in."
+    lede="Case studies focus on why a project exists, how it works, what failed, and what changed—not just the final screenshot."
+  />
+  <section class="shell project-grid" aria-label="Project case studies">
+    {projects.map((project) => <ProjectCard {project} />)}
+  </section>
+</BaseLayout>
+
+<style>
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  @media (max-width: 44rem) {
+    .project-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

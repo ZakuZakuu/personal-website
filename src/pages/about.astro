@@ -1,0 +1,71 @@
+---
+import PageHeader from '@/components/PageHeader.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="About"
+  description="About Ryan and the purpose of this personal knowledge site."
+>
+  <PageHeader
+    eyebrow="About"
+    title="A place to make the work legible."
+    lede="This page is deliberately incomplete until Ryan supplies the personal details that only he can verify."
+  />
+  <div class="shell about-grid">
+    <aside>
+      <p class="eyebrow">Profile status</p><p>
+        Placeholder copy is visibly marked and safe to replace. No biography, employer,
+        school, location, or credential has been inferred.
+      </p>
+    </aside>
+    <div class="prose">
+      <h2>What belongs here</h2>
+      <p>
+        A concise introduction should explain what Ryan works on, what he is learning, and
+        what kind of collaboration he welcomes. It should sound like a person, not a résumé
+        summary.
+      </p>
+      <h2>How this site is organized</h2>
+      <p>
+        <a href="/writing/">Writing</a> contains focused notes and longer articles. <a
+          href="/courses/">Courses</a
+        > arrange existing notes into learning paths. <a href="/projects/">Projects</a> preserve
+        decisions, failures, and lessons as case studies. The <a href="/now/">Now page</a> is
+        a lightweight current snapshot.
+      </p>
+      <h2>Contact and public profiles</h2>
+      <p>
+        Add only the links Ryan wants to make public—for example, an email address, GitHub
+        profile, résumé, or selected social account. These are intentionally absent from the
+        first build.
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(12rem, 18rem) minmax(0, var(--content));
+    gap: clamp(3rem, 9vw, 9rem);
+  }
+  aside {
+    align-self: start;
+    padding: 1.2rem;
+    border: 1px solid var(--line);
+    border-radius: 0.4rem;
+    background: var(--paper-raised);
+  }
+  aside p:last-child {
+    margin: 0.65rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    line-height: 1.65;
+  }
+  @media (max-width: 48rem) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

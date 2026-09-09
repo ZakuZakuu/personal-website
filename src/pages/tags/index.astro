@@ -1,0 +1,64 @@
+---
+import PageHeader from '@/components/PageHeader.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getTagIndex, getWriting } from '@/lib/content';
+
+const tags = getTagIndex(await getWriting());
+---
+
+<BaseLayout title="Tags" description="Browse writing by subject.">
+  <PageHeader
+    eyebrow="Tags"
+    title="Browse the recurring threads."
+    lede="Tags stay lightweight: they provide useful entry points without pretending the archive is a complete knowledge graph."
+  />
+  <nav class="shell tag-index" aria-label="All tags">
+    {
+      tags.map((tag) => (
+        <a href={`/tags/${tag.slug}/`}>
+          <>
+            <span>{tag.label}</span>
+            <strong>{tag.count}</strong>
+          </>
+        </a>
+      ))
+    }
+  </nav>
+</BaseLayout>
+
+<style>
+  .tag-index {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+  }
+  a {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+  }
+  a:nth-child(3n + 1) {
+    border-left: 1px solid var(--line);
+  }
+  span {
+    font-size: 0.85rem;
+  }
+  strong {
+    color: var(--line-strong);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+  @media (max-width: 42rem) {
+    .tag-index {
+      grid-template-columns: 1fr;
+    }
+    a:nth-child(n) {
+      border-left: 1px solid var(--line);
+    }
+  }
+</style>

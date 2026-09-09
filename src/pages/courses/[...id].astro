@@ -1,0 +1,194 @@
+---
+import { render } from 'astro:content';
+import ContentCard from '@/components/ContentCard.astro';
+import TagList from '@/components/TagList.astro';
+import { formatDate, getCourses, getCourseNotes, type CourseEntry } from '@/lib/content';
+import { pluralize } from '@/lib/text';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const courses = await getCourses();
+  return courses.map((course) => ({ params: { id: course.id }, props: { course } }));
+}
+
+interface Props {
+  course: CourseEntry;
+}
+const { course } = Astro.props;
+const notes = await getCourseNotes(course.id);
+const { Content } = await render(course);
+---
+
+<BaseLayout title={course.data.title} description={course.data.description}>
+  <article data-pagefind-body>
+    <header class="course-hero shell">
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="/courses/">Courses</a><span aria-hidden="true">/</span><span
+          >{course.data.status}</span
+        >
+      </nav>
+      <div class="course-grid">
+        <div>
+          <p class="eyebrow">Course{course.data.demo ? ' · Demo content' : ''}</p>
+          <h1 data-pagefind-meta="title">{course.data.title}</h1>
+          <p class="description">{course.data.description}</p>
+        </div>
+        <aside class="course-facts" aria-label="Course details">
+          <dl>
+            <div><dt>Status</dt><dd>{course.data.status}</dd></div><div>
+              <dt>Material</dt><dd>{pluralize(notes.length, 'note')}</dd>
+            </div>{
+              course.data.updated && (
+                <div>
+                  <>
+                    <dt>Updated</dt>
+                    <dd>{formatDate(course.data.updated)}</dd>
+                  </>
+                </div>
+              )
+            }
+          </dl>
+          <TagList tags={course.data.topics} linked={false} />
+          {course.data.sourceUrl && <a href={course.data.sourceUrl}>Course source ↗</a>}
+        </aside>
+      </div>
+    </header>
+    <div class="course-body shell">
+      <section class="prose overview"><p class="eyebrow">Overview</p><Content /></section>
+      <section aria-labelledby="curriculum-title">
+        <p class="eyebrow">Curriculum</p><h2 id="curriculum-title">Ordered notes</h2>
+        {
+          notes.length > 0 ? (
+            <ol class="curriculum">
+              {notes.map((note, index) => (
+                <li>
+                  <span class="number">{String(index + 1).padStart(2, '0')}</span>
+                  <ContentCard entry={note} compact />
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p class="empty">
+              Notes will appear here when they are linked through course metadata.
+            </p>
+          )
+        }
+      </section>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .course-hero {
+    padding-block: clamp(4rem, 9vw, 7rem);
+    border-bottom: 1px solid var(--line);
+  }
+  .breadcrumbs {
+    display: flex;
+    gap: 0.55rem;
+    margin-bottom: 3.5rem;
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.69rem;
+    text-transform: capitalize;
+  }
+  .breadcrumbs a {
+    text-decoration: none;
+  }
+  .course-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 20rem);
+    gap: clamp(3rem, 8vw, 8rem);
+    align-items: end;
+  }
+  h1 {
+    max-width: 17ch;
+    margin: 0.85rem 0 0;
+    font-family: ui-serif, Georgia, serif;
+    font-size: clamp(2.8rem, 7vw, 5.8rem);
+    font-weight: 510;
+    letter-spacing: -0.065em;
+    line-height: 0.98;
+  }
+  .description {
+    max-width: 42rem;
+    margin: 1.5rem 0 0;
+    color: var(--ink-soft);
+    font-size: 1.1rem;
+    line-height: 1.65;
+  }
+  .course-facts {
+    padding: 1.2rem;
+    border: 1px solid var(--line);
+    border-radius: 0.45rem;
+    background: var(--paper-raised);
+  }
+  dl {
+    display: grid;
+    gap: 0.65rem;
+    margin: 0 0 1rem;
+  }
+  dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+  }
+  dt {
+    color: var(--ink-soft);
+  }
+  dd {
+    margin: 0;
+    color: var(--ink);
+  }
+  .course-facts > a {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+  }
+  .course-body {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(20rem, 1fr);
+    gap: clamp(3rem, 9vw, 9rem);
+    padding-top: clamp(3.5rem, 7vw, 6rem);
+  }
+  .overview :global(.eyebrow) {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+  }
+  h2 {
+    margin: 0.5rem 0 1.5rem;
+    font-family: ui-serif, Georgia, serif;
+    font-size: 2rem;
+    font-weight: 540;
+    letter-spacing: -0.04em;
+  }
+  .curriculum {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .curriculum li {
+    display: grid;
+    grid-template-columns: 2.2rem 1fr;
+    gap: 0.8rem;
+    align-items: start;
+  }
+  .number {
+    padding-top: 1.15rem;
+    color: var(--line-strong);
+    font-family: var(--font-mono);
+    font-size: 0.67rem;
+  }
+  .empty {
+    color: var(--ink-soft);
+  }
+  @media (max-width: 49rem) {
+    .course-grid,
+    .course-body {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

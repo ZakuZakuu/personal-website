@@ -1,0 +1,93 @@
+---
+import type { WritingEntry } from '@/lib/content';
+import { formatDate, writingHref } from '@/lib/content';
+import TagList from './TagList.astro';
+
+interface Props {
+  entry: WritingEntry;
+  compact?: boolean;
+}
+
+const { entry, compact = false } = Astro.props;
+const kind = entry.collection === 'articles' ? 'Article' : 'Note';
+---
+
+<article class:list={['content-card', { compact }]}>
+  <div class="meta">
+    <span class="kind">{kind}</span>
+    <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
+    {entry.data.demo && <span class="demo">Demo</span>}
+  </div>
+  <h3><a href={writingHref(entry)}>{entry.data.title}</a></h3>
+  {!compact && <p>{entry.data.description}</p>}
+  {!compact && <TagList tags={entry.data.tags} />}
+</article>
+
+<style>
+  .content-card {
+    position: relative;
+    padding-block: 1.45rem;
+    border-top: 1px solid var(--line);
+  }
+  .content-card:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.67rem;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+  }
+  .kind {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .demo {
+    padding: 0.08rem 0.34rem;
+    border: 1px solid var(--line);
+    border-radius: 0.2rem;
+    font-size: 0.58rem;
+  }
+  h3 {
+    max-width: 34ch;
+    margin: 0.55rem 0 0;
+    font-family: ui-serif, Georgia, serif;
+    font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+    font-weight: 560;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h3 a {
+    text-decoration: none;
+  }
+  h3 a::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+  }
+  p {
+    max-width: 55rem;
+    margin: 0.55rem 0 1rem;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+  :global(.tags) {
+    position: relative;
+    z-index: 1;
+  }
+  .compact {
+    padding-block: 1.05rem;
+  }
+  .compact h3 {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 580;
+    letter-spacing: -0.01em;
+  }
+</style>

@@ -1,0 +1,49 @@
+---
+import { slugifyTag } from '@/lib/text';
+
+interface Props {
+  tags: string[];
+  linked?: boolean;
+}
+
+const { tags, linked = true } = Astro.props;
+---
+
+{
+  tags.length > 0 && (
+    <ul class="tags" aria-label="Tags">
+      {tags.map((tag) => (
+        <li>
+          {linked ? <a href={`/tags/${slugifyTag(tag)}/`}>{tag}</a> : <span>{tag}</span>}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.38rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  a,
+  span {
+    display: inline-flex;
+    padding: 0.22rem 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    line-height: 1.35;
+    text-decoration: none;
+  }
+  a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+</style>

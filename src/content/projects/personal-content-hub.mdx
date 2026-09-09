@@ -1,0 +1,57 @@
+---
+title: Personal Content Hub
+description: A case-study-shaped demonstration of the architecture used by this repository.
+date: 2026-09-10
+status: building
+tech: [Astro, TypeScript, Tailwind CSS, MDX]
+tags: [publishing, architecture]
+featured: true
+demo: true
+related: [static-sites-as-content-systems, durable-technical-notes]
+---
+
+import Callout from '../../components/Callout.astro';
+
+<Callout title="About this case study" variant="note">
+  The architecture described here is real to this repository. The motivation and lessons are
+  intentionally limited to facts visible in the project brief and implementation.
+</Callout>
+
+## Overview
+
+This repository is a static personal content hub. It brings notes, articles, courses, projects, and small internal insights into one typed Markdown system.
+
+## Motivation
+
+The project brief asks for the website to remain the canonical source while social channels receive derived versions. That makes durable source files and explicit content relationships more important than an editing dashboard.
+
+## Architecture
+
+```text
+Markdown / MDX
+      │
+      ▼
+Typed content collections
+      │
+      ├── writing and course relationships
+      ├── project case studies
+      └── feeds and discovery
+      │
+      ▼
+Static Astro pages
+```
+
+## Technical decisions
+
+- Static generation is the default; there is no database, authentication layer, or runtime content API.
+- Notes belong to courses through metadata and are never duplicated into course directories.
+- Search is generated from built HTML, keeping the production site independent of a server.
+- The visual system uses a compact set of CSS tokens so the reading experience can evolve without coupling content to components.
+
+## Current status
+
+The first public build establishes the content model and the core browsing experience. Real profile copy, external links, and final deployment details still require owner input.
+
+## Next steps
+
+Replace demo content with material derived from real learning and project conversations, then connect the final domain and selected public profiles.

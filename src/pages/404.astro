@@ -1,0 +1,68 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Page not found"
+  description="The requested page could not be found."
+  noindex
+>
+  <section class="shell not-found">
+    <p class="code" aria-hidden="true">404</p>
+    <div>
+      <p class="eyebrow">Page not found</p>
+      <h1>This path ends here.</h1>
+      <p>
+        The page may have moved, or the link may never have existed. The archive is the most
+        reliable way back into the site.
+      </p>
+      <nav><a href="/">Go home</a><a href="/archive/">Browse the archive →</a></nav>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    grid-template-columns: minmax(10rem, 0.6fr) 1fr;
+    gap: clamp(2rem, 8vw, 8rem);
+    align-items: center;
+    min-height: 65vh;
+  }
+  .code {
+    margin: 0;
+    color: var(--line);
+    font-family: var(--font-mono);
+    font-size: clamp(6rem, 18vw, 13rem);
+    font-weight: 700;
+    letter-spacing: -0.12em;
+  }
+  h1 {
+    margin: 0.8rem 0 1rem;
+    font-family: ui-serif, Georgia, serif;
+    font-size: clamp(2.5rem, 6vw, 4.8rem);
+    font-weight: 520;
+    letter-spacing: -0.055em;
+    line-height: 1;
+  }
+  div > p:last-of-type {
+    max-width: 35rem;
+    color: var(--ink-soft);
+    line-height: 1.7;
+  }
+  nav {
+    display: flex;
+    gap: 1.2rem;
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+  }
+  @media (max-width: 44rem) {
+    .not-found {
+      grid-template-columns: 1fr;
+      align-content: center;
+    }
+    .code {
+      line-height: 0.75;
+    }
+  }
+</style>

@@ -1,0 +1,56 @@
+---
+import { getCollection, render } from 'astro:content';
+import { formatDate } from '@/lib/content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const snapshots = await getCollection('now', ({ data }) => !data.draft);
+const current = snapshots.sort(
+  (a, b) => b.data.updated.valueOf() - a.data.updated.valueOf(),
+)[0];
+if (!current) throw new Error('A published Now entry is required.');
+const { Content } = await render(current);
+---
+
+<BaseLayout title="Now" description={current.data.description}>
+  <article class="now-page reading-width" data-pagefind-body>
+    <header>
+      <p class="eyebrow">Now{current.data.demo ? ' · Demo prompts' : ''}</p><h1
+        data-pagefind-meta="title"
+      >
+        What’s happening now.
+      </h1><p>
+        Last updated <time datetime={current.data.updated.toISOString()}
+          >{formatDate(current.data.updated)}</time
+        >. Inspired by the <a href="https://nownownow.com/about">/now page movement ↗</a>.
+      </p>
+    </header>
+    <div class="prose"><Content /></div>
+  </article>
+</BaseLayout>
+
+<style>
+  .now-page {
+    padding-top: clamp(4rem, 9vw, 7rem);
+  }
+  header {
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  h1 {
+    max-width: 13ch;
+    margin: 0.8rem 0 1.2rem;
+    font-family: ui-serif, Georgia, serif;
+    font-size: clamp(3rem, 8vw, 5.8rem);
+    font-weight: 520;
+    letter-spacing: -0.065em;
+    line-height: 0.98;
+  }
+  header p:last-child {
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.69rem;
+  }
+  .prose {
+    margin-top: 3rem;
+  }
+</style>
