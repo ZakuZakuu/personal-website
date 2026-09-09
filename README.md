@@ -74,6 +74,8 @@ pnpm media:social-card
 
 Important trade-offs are recorded in [docs/DECISIONS.md](docs/DECISIONS.md).
 
+GitHub Actions repeats the type/content checks, formatting check, unit tests, production build, desktop/mobile browser tests, and Axe accessibility audit on pushes and pull requests.
+
 ## Replace before deployment
 
 Demo entries carry `demo: true` and display a visible label. They validate the layouts without claiming personal history. Before the first real deployment:
