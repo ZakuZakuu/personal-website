@@ -171,6 +171,22 @@ input {
   font-size: 1em;
   font-weight: 700;
 }
+.prose .heading-anchor {
+  margin-left: 0.4em;
+  color: var(--line-strong);
+  font-family: var(--font-mono);
+  font-size: 0.65em;
+  font-weight: 500;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.prose h2:hover .heading-anchor,
+.prose h3:hover .heading-anchor,
+.prose h4:hover .heading-anchor,
+.prose .heading-anchor:focus-visible {
+  opacity: 1;
+}
 .prose strong {
   font-weight: 700;
 }

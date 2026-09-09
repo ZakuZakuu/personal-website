@@ -8,7 +8,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
   description="Search the writing, projects, and courses on this site."
 >
   <Fragment slot="head">
-    <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+    <link href="/pagefind/pagefind-component-ui.css" rel="stylesheet" />
+    <script is:inline src="/pagefind/pagefind-component-ui.js" type="module"></script>
   </Fragment>
   <PageHeader
     eyebrow="Search"
@@ -16,29 +17,15 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     lede="Search runs entirely in the browser over an index generated during the production build."
   />
   <section class="shell search-shell" aria-label="Site search">
-    <div id="search"></div>
+    <pagefind-config excerpt-length="28"></pagefind-config>
+    <pagefind-input placeholder="Search notes, articles, projects…"></pagefind-input>
+    <pagefind-summary></pagefind-summary>
+    <pagefind-results></pagefind-results>
     <noscript
       >Search requires JavaScript. The <a href="/archive/">archive</a> remains available.</noscript
     >
-    <p class="dev-note">
-      Run <code>pnpm build</code> once to generate the local search index.
-    </p>
+    <p class="search-hint">Try a concept, project, or phrase from the archive.</p>
   </section>
-  <script is:inline type="module">
-    const root = document.querySelector('#search');
-    try {
-      const { PagefindUI } = await import('/pagefind/pagefind-ui.js');
-      new PagefindUI({
-        element: '#search',
-        showSubResults: true,
-        showImages: false,
-        resetStyles: false,
-      });
-    } catch {
-      if (root)
-        root.innerHTML = '<p>Search becomes available after a production build.</p>';
-    }
-  </script>
 </BaseLayout>
 
 <style>
@@ -46,44 +33,26 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     max-width: 52rem;
     min-height: 18rem;
   }
-  .dev-note {
+  .search-hint {
     margin-top: 2rem;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+  }
+  pagefind-input,
+  pagefind-results,
+  pagefind-summary {
+    display: block;
+  }
+  pagefind-summary {
+    margin-block: 1.5rem 0.75rem;
     color: var(--ink-soft);
     font-family: var(--font-mono);
-    font-size: 0.67rem;
+    font-size: 0.7rem;
   }
-  :global(.pagefind-ui__search-input) {
-    width: 100%;
-    padding: 1rem 1rem 1rem 3rem;
-    border: 1px solid var(--line-strong);
-    border-radius: 0.35rem;
-    background: var(--paper-raised);
-    color: var(--ink);
-    font-size: 1rem;
-  }
-  :global(.pagefind-ui__drawer) {
-    margin-top: 2rem;
-  }
-  :global(.pagefind-ui__result) {
-    padding-block: 1.4rem;
-    border-top: 1px solid var(--line);
-  }
-  :global(.pagefind-ui__result-title) {
-    margin: 0;
-    font-family: ui-serif, Georgia, serif;
-    font-size: 1.35rem;
-  }
-  :global(.pagefind-ui__result-link) {
-    text-decoration: none;
-  }
-  :global(.pagefind-ui__result-excerpt),
-  :global(.pagefind-ui__message) {
-    color: var(--ink-soft);
-    font-size: 0.85rem;
-    line-height: 1.6;
-  }
-  :global(mark) {
-    background: var(--accent-soft);
-    color: var(--ink);
+  pagefind-results {
+    --pagefind-ui-primary: var(--accent);
+    --pagefind-ui-text: var(--ink);
+    --pagefind-ui-background: var(--paper);
+    --pagefind-ui-border: var(--line);
   }
 </style>

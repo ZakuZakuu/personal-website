@@ -15,7 +15,7 @@ interface Props {
 const {
   title = site.title,
   description = site.description,
-  image = '/social-card.svg',
+  image = '/social-card.png',
   article = false,
   noindex = false,
 } = Astro.props;
@@ -63,7 +63,7 @@ const socialImage = new URL(image, Astro.site);
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <SiteHeader />
-    <main id="main-content" data-pagefind-body>
+    <main id="main-content">
       <slot />
     </main>
     <SiteFooter />

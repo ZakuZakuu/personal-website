@@ -11,7 +11,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
       <span aria-hidden="true">R</span><span class="wordmark-dot" aria-hidden="true">/</span
       >
     </a>
-    <nav aria-label="Primary navigation">
+    <nav class="desktop-nav" aria-label="Primary navigation">
       <ul>
         {
           site.nav.map((item) => (
@@ -24,6 +24,22 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
         }
       </ul>
     </nav>
+    <details class="mobile-menu">
+      <summary>Menu</summary>
+      <nav aria-label="Mobile navigation">
+        <ul>
+          {
+            site.nav.map((item) => (
+              <li>
+                <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </details>
     <button
       class="theme-toggle"
       type="button"
@@ -44,6 +60,10 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     localStorage.setItem('theme', theme);
     button?.setAttribute('aria-label', `Use ${theme === 'dark' ? 'light' : 'dark'} theme`);
   };
+  button?.setAttribute(
+    'aria-label',
+    `Use ${document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'} theme`,
+  );
   button?.addEventListener('click', () => {
     applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
   });
@@ -75,6 +95,9 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   }
   .wordmark-dot {
     color: var(--accent);
+  }
+  .mobile-menu {
+    display: none;
   }
   ul {
     display: flex;
@@ -126,21 +149,67 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   }
   @media (max-width: 44rem) {
     .header-inner {
-      grid-template-columns: auto 1fr auto;
-      gap: 0.9rem;
+      grid-template-columns: 1fr auto auto;
+      gap: 0.75rem;
     }
-    nav {
-      overflow-x: auto;
-      scrollbar-width: none;
+    .desktop-nav {
+      display: none;
     }
-    nav ul {
-      justify-content: flex-start;
-      gap: 1rem;
-      min-width: max-content;
-      padding-inline: 0.15rem;
+    .mobile-menu {
+      display: block;
+      justify-self: end;
     }
-    nav a {
-      font-size: 0.76rem;
+    .mobile-menu summary {
+      display: block;
+      padding: 0.45rem 0.6rem;
+      color: var(--ink-soft);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      list-style: none;
+    }
+    .mobile-menu summary::-webkit-details-marker {
+      display: none;
+    }
+    .mobile-menu summary::before {
+      content: '+ ';
+      color: var(--accent);
+    }
+    .mobile-menu[open] summary::before {
+      content: '− ';
+    }
+    .mobile-menu nav {
+      position: fixed;
+      top: var(--header-height);
+      right: 0;
+      left: 0;
+      padding: 0.6rem 1rem 1rem;
+      border-bottom: 1px solid var(--line);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .mobile-menu ul {
+      display: grid;
+      gap: 0;
+    }
+    .mobile-menu li + li {
+      border-top: 1px solid var(--line);
+    }
+    .mobile-menu a {
+      display: flex;
+      padding: 0.85rem 0.25rem;
+      font-size: 0.86rem;
+    }
+    .mobile-menu a[aria-current='page'] {
+      text-decoration: none;
+    }
+    .theme-toggle {
+      width: 2rem;
+      height: 2rem;
+    }
+    .wordmark {
+      font-size: 0.95rem;
     }
   }
 </style>

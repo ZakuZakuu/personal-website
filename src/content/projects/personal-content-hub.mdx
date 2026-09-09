@@ -11,6 +11,8 @@ related: [static-sites-as-content-systems, durable-technical-notes]
 ---
 
 import Callout from '../../components/Callout.astro';
+import MediaFigure from '../../components/MediaFigure.astro';
+import contentFlow from './content-flow.svg';
 
 <Callout title="About this case study" variant="note">
   The architecture described here is real to this repository. The motivation and lessons are
@@ -27,19 +29,11 @@ The project brief asks for the website to remain the canonical source while soci
 
 ## Architecture
 
-```text
-Markdown / MDX
-      │
-      ▼
-Typed content collections
-      │
-      ├── writing and course relationships
-      ├── project case studies
-      └── feeds and discovery
-      │
-      ▼
-Static Astro pages
-```
+<MediaFigure
+  src={contentFlow}
+  alt="Content moving from Markdown through typed collections to static pages, search, RSS, and sitemap outputs"
+  caption="The source stays portable while the build derives several reader-facing views."
+/>
 
 ## Technical decisions
 

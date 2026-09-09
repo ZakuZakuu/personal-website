@@ -4,7 +4,10 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 import rehypeKatex from 'rehype-katex';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeSlug from 'rehype-slug';
 import remarkMath from 'remark-math';
+import rehypeFocusableKatex from './src/lib/rehype-focusable-katex.mjs';
 
 export default defineConfig({
   site: process.env.SITE_URL ?? 'https://example.com',
@@ -13,7 +16,22 @@ export default defineConfig({
   markdown: {
     processor: unified({
       remarkPlugins: [remarkMath],
-      rehypePlugins: [rehypeKatex],
+      rehypePlugins: [
+        rehypeKatex,
+        rehypeFocusableKatex,
+        rehypeSlug,
+        [
+          rehypeAutolinkHeadings,
+          {
+            behavior: 'append',
+            properties: {
+              className: ['heading-anchor'],
+              ariaLabel: 'Link to this section',
+            },
+            content: { type: 'text', value: '#' },
+          },
+        ],
+      ],
     }),
     shikiConfig: {
       themes: {
