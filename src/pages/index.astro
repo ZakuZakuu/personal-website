@@ -1,0 +1,44 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout>
+  <div class="shell hero">
+    <p class="eyebrow">Personal knowledge site · first public build</p>
+    <h1>Hi, I’m Ryan.</h1>
+    <p class="lede">
+      A quiet home for what I’m learning, building, and trying to understand.
+    </p>
+    <p class="placeholder">
+      The content system and complete site experience are being established here.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: clamp(5rem, 14vw, 10rem);
+  }
+  h1 {
+    max-width: 12ch;
+    margin: 1.1rem 0 0;
+    font-size: clamp(3.4rem, 9vw, 7.7rem);
+    font-weight: 560;
+    letter-spacing: -0.075em;
+    line-height: 0.95;
+  }
+  .lede {
+    max-width: 35rem;
+    margin: 2rem 0 0;
+    color: var(--ink-soft);
+    font-family: ui-serif, Georgia, serif;
+    font-size: clamp(1.35rem, 3vw, 2rem);
+    line-height: 1.45;
+  }
+  .placeholder {
+    margin-top: 4rem;
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+</style>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f7f6f2"/>
+  <circle cx="110" cy="92" r="10" fill="#176f5b"/>
+  <path d="M80 122h1040" stroke="#dadcd5"/>
+  <text x="80" y="335" fill="#1d211f" font-family="system-ui, sans-serif" font-size="92" font-weight="600" letter-spacing="-5">Ryan</text>
+  <text x="80" y="420" fill="#626862" font-family="Georgia, serif" font-size="38">Learning, building, and writing in public.</text>
+  <text x="80" y="550" fill="#176f5b" font-family="monospace" font-size="22" letter-spacing="2">NOTES · ARTICLES · PROJECTS · COURSES</text>
+</svg>
+

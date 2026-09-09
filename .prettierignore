@@ -1,0 +1,8 @@
+dist
+node_modules
+.astro
+public/pagefind
+pnpm-lock.yaml
+AGENTS.md
+OVERNIGHT_TASK.md
+PROJECT_BRIEF.md

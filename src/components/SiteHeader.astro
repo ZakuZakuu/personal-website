@@ -1,0 +1,146 @@
+---
+import { site } from '@/site.config';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="wordmark" href="/" aria-label={`${site.name} home`}>
+      <span aria-hidden="true">R</span><span class="wordmark-dot" aria-hidden="true">/</span
+      >
+    </a>
+    <nav aria-label="Primary navigation">
+      <ul>
+        {
+          site.nav.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <button
+      class="theme-toggle"
+      type="button"
+      aria-label="Toggle color theme"
+      title="Toggle color theme"
+    >
+      <span class="sun" aria-hidden="true">☼</span><span class="moon" aria-hidden="true"
+        >◐</span
+      >
+    </button>
+  </div>
+</header>
+
+<script is:inline>
+  const button = document.querySelector('.theme-toggle');
+  const applyTheme = (theme) => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('theme', theme);
+    button?.setAttribute('aria-label', `Use ${theme === 'dark' ? 'light' : 'dark'} theme`);
+  };
+  button?.addEventListener('click', () => {
+    applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+  });
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    z-index: 50;
+    top: 0;
+    height: var(--header-height);
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(14px);
+  }
+  .header-inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    height: 100%;
+  }
+  .wordmark {
+    justify-self: start;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 1.05rem;
+    font-weight: 750;
+    text-decoration: none;
+  }
+  .wordmark-dot {
+    color: var(--accent);
+  }
+  ul {
+    display: flex;
+    gap: 1.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  nav a {
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+    font-weight: 560;
+    text-decoration: none;
+  }
+  nav a[aria-current='page'],
+  nav a:hover {
+    color: var(--ink);
+  }
+  nav a[aria-current='page'] {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.42rem;
+  }
+  .theme-toggle {
+    display: inline-grid;
+    justify-self: end;
+    width: 2.2rem;
+    height: 2.2rem;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .theme-toggle:hover {
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+  .moon {
+    display: none;
+  }
+  :global(:root[data-theme='dark']) .sun {
+    display: none;
+  }
+  :global(:root[data-theme='dark']) .moon {
+    display: inline;
+  }
+  @media (max-width: 44rem) {
+    .header-inner {
+      grid-template-columns: auto 1fr auto;
+      gap: 0.9rem;
+    }
+    nav {
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    nav ul {
+      justify-content: flex-start;
+      gap: 1rem;
+      min-width: max-content;
+      padding-inline: 0.15rem;
+    }
+    nav a {
+      font-size: 0.76rem;
+    }
+  }
+</style>
