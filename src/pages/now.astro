@@ -11,17 +11,17 @@ if (!current) throw new Error('A published Now entry is required.');
 const { Content } = await render(current);
 ---
 
-<BaseLayout title="Now" description={current.data.description}>
+<BaseLayout title="近况" description={current.data.description}>
   <article class="now-page reading-width" data-pagefind-body>
     <header>
-      <p class="eyebrow">Now{current.data.demo ? ' · Demo prompts' : ''}</p><h1
+      <p class="eyebrow">近况{current.data.demo ? ' · 示例提示' : ''}</p><h1
         data-pagefind-meta="title"
       >
-        What’s happening now.
+        此刻正在发生的事。
       </h1><p>
-        Last updated <time datetime={current.data.updated.toISOString()}
+        更新于 <time datetime={current.data.updated.toISOString()}
           >{formatDate(current.data.updated)}</time
-        >. Inspired by the <a href="https://nownownow.com/about">/now page movement ↗</a>.
+        >。这个页面受 <a href="https://nownownow.com/about">/now page movement ↗</a> 启发。
       </p>
     </header>
     <div class="prose"><Content /></div>

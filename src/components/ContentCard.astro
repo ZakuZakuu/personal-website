@@ -9,14 +9,14 @@ interface Props {
 }
 
 const { entry, compact = false } = Astro.props;
-const kind = entry.collection === 'articles' ? 'Article' : 'Note';
+const kind = entry.collection === 'articles' ? '文章' : '笔记';
 ---
 
 <article class:list={['content-card', { compact }]}>
   <div class="meta">
     <span class="kind">{kind}</span>
     <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
-    {entry.data.demo && <span class="demo">Demo</span>}
+    {entry.data.demo && <span class="demo">示例</span>}
   </div>
   <h3><a href={writingHref(entry)}>{entry.data.title}</a></h3>
   {!compact && <p>{entry.data.description}</p>}
@@ -56,7 +56,7 @@ const kind = entry.collection === 'articles' ? 'Article' : 'Note';
   h3 {
     max-width: 34ch;
     margin: 0.55rem 0 0;
-    font-family: ui-serif, Georgia, serif;
+    font-family: var(--font-serif);
     font-size: clamp(1.25rem, 2.5vw, 1.6rem);
     font-weight: 560;
     letter-spacing: -0.02em;

@@ -9,31 +9,28 @@ const articles = writing.filter((entry) => entry.collection === 'articles');
 const notes = writing.filter((entry) => entry.collection === 'notes');
 ---
 
-<BaseLayout
-  title="Writing"
-  description="Articles and focused notes about technical ideas, systems, and ongoing learning."
->
+<BaseLayout title="文章" description="关于技术、系统与持续学习的文章和笔记。">
   <PageHeader
-    eyebrow="Writing"
-    title="Ideas, at two resolutions."
-    lede="Articles connect several ideas into a considered argument. Notes preserve one useful question or change in understanding."
+    eyebrow="文章与笔记"
+    title="在不同尺度上，保留一次理解。"
+    lede="文章将若干想法连成完整论述；笔记则聚焦一个问题，记录理解发生变化的时刻。"
   >
     <nav class="section-links" aria-label="Writing sections">
-      <a href="#articles">Articles <span>{articles.length}</span></a><a href="#notes"
-        >Notes <span>{notes.length}</span></a
-      ><a href="/tags/">Browse tags</a><a href="/search/">Search</a>
+      <a href="#articles">文章 <span>{articles.length}</span></a><a href="#notes"
+        >笔记 <span>{notes.length}</span></a
+      ><a href="/tags/">标签</a><a href="/search/">搜索</a>
     </nav>
   </PageHeader>
   <div class="shell writing-grid">
     <section id="articles" aria-labelledby="articles-title">
       <div class="section-heading">
-        <p class="eyebrow">Long-form</p><h2 id="articles-title">Articles</h2>
+        <p class="eyebrow">长文</p><h2 id="articles-title">文章</h2>
       </div>
       <div>{articles.map((entry) => <ContentCard entry={entry} />)}</div>
     </section>
     <section id="notes" aria-labelledby="notes-title">
       <div class="section-heading">
-        <p class="eyebrow">Working understanding</p><h2 id="notes-title">Notes</h2>
+        <p class="eyebrow">单点记录</p><h2 id="notes-title">笔记</h2>
       </div>
       <div>{notes.map((entry) => <ContentCard entry={entry} />)}</div>
     </section>
@@ -70,7 +67,7 @@ const notes = writing.filter((entry) => entry.collection === 'notes');
   }
   h2 {
     margin: 0.45rem 0 0;
-    font-family: ui-serif, Georgia, serif;
+    font-family: var(--font-serif);
     font-size: 2.15rem;
     font-weight: 540;
     letter-spacing: -0.04em;

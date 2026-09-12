@@ -52,7 +52,7 @@ export function writingHref(entry: WritingEntry): string {
 }
 
 export function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('en', {
+  return new Intl.DateTimeFormat('zh-CN', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -61,7 +61,7 @@ export function formatDate(date: Date): string {
 }
 
 export function formatMonth(date: Date): string {
-  return new Intl.DateTimeFormat('en', {
+  return new Intl.DateTimeFormat('zh-CN', {
     year: 'numeric',
     month: 'long',
     timeZone: 'UTC',

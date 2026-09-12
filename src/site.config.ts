@@ -1,14 +1,13 @@
 export const site = {
   name: '思构录',
-  title: '思构录 — Thinking, Making, Recording',
-  description:
-    'A place for thinking, making, and recording—across technical writing, learning notes, courses, and projects.',
+  title: '思构录 — 记录学习、构建与理解发生的地方',
+  description: '记录学习、构建与理解发生的地方，收录技术文章、学习笔记、课程与项目。',
   author: 'Ryan',
   nav: [
-    { href: '/', label: 'Home' },
-    { href: '/writing/', label: 'Writing' },
-    { href: '/projects/', label: 'Projects' },
-    { href: '/courses/', label: 'Courses' },
-    { href: '/about/', label: 'About' },
+    { href: '/', label: '首页' },
+    { href: '/writing/', label: '文章' },
+    { href: '/projects/', label: '项目' },
+    { href: '/courses/', label: '课程' },
+    { href: '/about/', label: '关于' },
   ],
 } as const;

@@ -31,7 +31,7 @@ test('theme choice persists after navigation', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-  await page.getByRole('button', { name: 'Use dark theme' }).click();
+  await page.getByRole('button', { name: '切换到深色主题' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
@@ -60,8 +60,8 @@ test('the production search component is registered', async ({ page }) => {
 test('mobile navigation exposes every primary destination', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'Mobile navigation is only rendered at the compact breakpoint.');
   await page.goto('/');
-  await page.getByText('Menu', { exact: true }).click();
-  const navigation = page.getByRole('navigation', { name: 'Mobile navigation' });
+  await page.getByText('菜单', { exact: true }).click();
+  const navigation = page.getByRole('navigation', { name: '移动端导航' });
   await expect(navigation).toBeVisible();
   await expect(navigation.getByRole('link')).toHaveCount(5);
 });

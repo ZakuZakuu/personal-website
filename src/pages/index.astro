@@ -1,273 +1,271 @@
 ---
-import ContentCard from '@/components/ContentCard.astro';
-import ProjectCard from '@/components/ProjectCard.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { getProjects, getWriting } from '@/lib/content';
+import { formatDate, getProjects, getWriting, writingHref } from '@/lib/content';
 
 const [writing, projects] = await Promise.all([getWriting(), getProjects()]);
-const featuredWriting = writing.filter((entry) => entry.data.featured).slice(0, 2);
-const featuredProjects = projects.filter((entry) => entry.data.featured).slice(0, 2);
-const recentNotes = writing.filter((entry) => entry.collection === 'notes').slice(0, 3);
+const currentProject = projects[0];
+const records = [
+  ...writing.map((entry) => ({
+    kind: entry.collection === 'articles' ? '文章' : '笔记',
+    title: entry.data.title,
+    description: entry.data.description,
+    date: entry.data.date,
+    href: writingHref(entry),
+  })),
+  ...projects.map((entry) => ({
+    kind: '项目',
+    title: entry.data.title,
+    description: entry.data.description,
+    date: entry.data.date,
+    href: `/projects/${entry.id}/`,
+  })),
+]
+  .sort((a, b) => b.date.valueOf() - a.date.valueOf())
+  .slice(0, 8);
 ---
 
 <BaseLayout>
   <section class="shell hero">
-    <div class="hero-copy">
-      <p class="eyebrow">Thinking, Making, Recording</p>
-      <h1>思构录</h1>
-      <p class="lede">
-        A place to trace ideas as they are questioned, built, and gradually understood.
-      </p>
-      <nav aria-label="Introduction links">
-        <a class="primary" href="/writing/"
-          >Explore the writing <span aria-hidden="true">→</span></a
-        >
-        <a href="/about/">About this site</a>
-      </nav>
+    <div class="title-block">
+      <p class="seal" aria-hidden="true">思<br />构</p>
+      <div><p class="eyebrow">一处持续生长的数字手稿</p><h1>思构录</h1></div>
     </div>
-    <aside class="hero-index" aria-label="Site contents">
-      <p><span>Index / 01</span><span>Current scope</span></p>
-      <ol>
-        <li><span>Writing</span><strong>{writing.length}</strong></li>
-        <li><span>Projects</span><strong>{projects.length}</strong></li>
-        <li><span>Courses</span><strong>02</strong></li>
-      </ol>
-      <a href="/now/"
-        ><span class="pulse" aria-hidden="true"></span>See what’s happening now</a
-      >
-    </aside>
+    <p class="lede">记录学习、构建与理解发生的地方。</p>
+    <p class="introduction">
+      这里收录技术写作、学习笔记和项目实践。与其只保留最后的答案，我更想记下问题如何出现，以及理解如何在过程中改变。
+    </p>
+    <nav aria-label="快速入口">
+      <a href="#records">阅读近期记录 ↓</a><a href="/about/">关于思构录</a>
+    </nav>
   </section>
-  <section class="shell home-section" aria-labelledby="featured-writing-title">
+
+  {
+    currentProject && (
+      <section class="forming" aria-labelledby="forming-title">
+        <div class="shell forming-inner">
+          <div>
+            <>
+              <p class="eyebrow">正在形成</p>
+              <span>NOW</span>
+            </>
+          </div>
+          <div class="forming-copy">
+            <h2 id="forming-title">{currentProject.data.title}</h2>
+            <p>{currentProject.data.description}</p>
+          </div>
+          <a href={`/projects/${currentProject.id}/`}>查看项目 →</a>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="shell records" id="records" aria-labelledby="records-title">
     <header>
-      <p class="eyebrow">Selected ideas</p><h2 id="featured-writing-title">
-        Featured writing
-      </h2><a href="/writing/">All writing →</a>
+      <p class="eyebrow">近期记录</p><h2 id="records-title">
+        按它们进入思构录的时间排列。
+      </h2>
     </header>
-    <div class="writing-list">
-      {featuredWriting.map((entry) => <ContentCard entry={entry} />)}
-    </div>
+    <ol>
+      {
+        records.map((record, index) => (
+          <li>
+            <a href={record.href}>
+              <span class="number">{String(index + 1).padStart(2, '0')}</span>
+              <div class="record-copy">
+                <div class="meta">
+                  <>
+                    <span>{record.kind}</span>
+                    <time datetime={record.date.toISOString()}>
+                      {formatDate(record.date)}
+                    </time>
+                  </>
+                </div>
+                <>
+                  <h3>{record.title}</h3>
+                  <p>{record.description}</p>
+                </>
+              </div>
+              <span class="arrow" aria-hidden="true">
+                ↗
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+    <a class="archive-link" href="/archive/">查看全部归档 →</a>
   </section>
-  <section class="project-band" aria-labelledby="featured-projects-title">
-    <div class="shell home-section">
-      <header>
-        <p class="eyebrow">Things made</p><h2 id="featured-projects-title">
-          Featured projects
-        </h2><a href="/projects/">All projects →</a>
-      </header>
-      <div class="project-grid">
-        {featuredProjects.map((project) => <ProjectCard {project} />)}
-      </div>
-    </div>
-  </section>
-  <div class="shell lower-grid">
-    <section class="home-section" aria-labelledby="recent-notes-title">
-      <header>
-        <p class="eyebrow">Recently understood</p><h2 id="recent-notes-title">
-          Recent notes
-        </h2>
-      </header>
-      <div>{recentNotes.map((entry) => <ContentCard entry={entry} compact />)}</div>
-    </section>
-    <aside class="now-card">
-      <p class="eyebrow">Now / Sep 2026</p>
-      <h2>A current snapshot, without the feed.</h2>
-      <p>
-        The Now page is ready for a concise account of what is being learned, built, read,
-        and explored.
-      </p>
-      <a href="/now/">Open the current snapshot →</a>
-    </aside>
-  </div>
 </BaseLayout>
 
 <style>
   .hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1.5fr) minmax(16rem, 0.55fr);
-    gap: clamp(3rem, 8vw, 8rem);
-    align-items: end;
-    min-height: calc(100svh - var(--header-height));
-    padding-block: clamp(4.5rem, 10vw, 8rem);
+    min-height: min(48rem, calc(100svh - var(--header-height)));
+    padding-block: clamp(5.5rem, 13vw, 10rem) clamp(5rem, 10vw, 8rem);
+  }
+  .title-block {
+    display: flex;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    align-items: flex-start;
+  }
+  .seal {
+    width: 2.8rem;
+    margin: 0.15rem 0 0;
+    padding: 0.35rem 0;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: var(--font-serif);
+    font-size: 0.8rem;
+    line-height: 1.25;
+    text-align: center;
   }
   h1 {
-    max-width: 10ch;
-    margin: 1.1rem 0 0;
-    font-size: clamp(3.4rem, 9vw, 7.7rem);
-    font-weight: 560;
-    letter-spacing: -0.075em;
+    margin: 0.7rem 0 0;
+    font-family: var(--font-serif);
+    font-size: clamp(4rem, 12vw, 8.8rem);
+    font-weight: 520;
+    letter-spacing: 0.08em;
     line-height: 0.95;
   }
   .lede {
-    max-width: 35rem;
-    margin: 2rem 0 0;
+    max-width: 30em;
+    margin: clamp(2.5rem, 6vw, 4.5rem) 0 0;
+    font-family: var(--font-serif);
+    font-size: clamp(1.35rem, 2.8vw, 2rem);
+    line-height: 1.7;
+  }
+  .introduction {
+    max-width: 40rem;
+    margin: 1.4rem 0 0;
     color: var(--ink-soft);
-    font-family: ui-serif, Georgia, serif;
-    font-size: clamp(1.35rem, 3vw, 2rem);
-    line-height: 1.45;
+    font-family: var(--font-serif);
+    line-height: 1.9;
   }
-  .lede em {
-    color: var(--ink);
-    font-style: normal;
-  }
-  .hero-copy nav {
+  .hero nav {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.8rem 1.4rem;
-    align-items: center;
-    margin-top: 2.2rem;
+    gap: 1rem 2rem;
+    margin-top: 2.5rem;
   }
-  .hero-copy nav a {
-    font-size: 0.82rem;
+  .hero nav a,
+  .forming a,
+  .archive-link {
+    color: var(--accent);
+    font-size: 0.8rem;
     text-decoration: none;
   }
-  .hero-copy nav .primary {
-    padding: 0.75rem 1rem;
-    border-radius: 0.3rem;
-    background: var(--ink);
-    color: var(--paper);
+  .forming {
+    border-block: 1px solid var(--line);
+    background: color-mix(in srgb, var(--paper-raised) 64%, transparent);
   }
-  .hero-copy nav .primary:hover {
-    background: var(--accent);
+  .forming-inner {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr) auto;
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: center;
+    padding-block: 2.5rem;
   }
-  .hero-index {
-    border-top: 1px solid var(--line-strong);
+  .forming-inner span {
+    color: var(--line-strong);
     font-family: var(--font-mono);
+    font-size: 0.62rem;
   }
-  .hero-index > p {
-    display: flex;
-    justify-content: space-between;
+  .forming-copy h2 {
     margin: 0;
-    padding-block: 0.7rem;
-    color: var(--ink-soft);
-    font-size: 0.64rem;
-    text-transform: uppercase;
+    font-family: var(--font-serif);
+    font-size: clamp(1.45rem, 3vw, 2.1rem);
+    font-weight: 560;
   }
-  .hero-index ol {
+  .forming-copy p {
+    max-width: 42rem;
+    margin: 0.55rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+  .records {
+    padding-block: clamp(5rem, 11vw, 9rem);
+  }
+  .records > header {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 36rem);
+    gap: clamp(2rem, 6vw, 6rem);
+    margin-bottom: 3rem;
+  }
+  .records h2 {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(1.65rem, 3.5vw, 2.6rem);
+    font-weight: 520;
+    line-height: 1.4;
+  }
+  .records ol {
     margin: 0;
     padding: 0;
-    border-bottom: 1px solid var(--line);
+    border-top: 1px solid var(--line-strong);
     list-style: none;
   }
-  .hero-index li {
-    display: flex;
-    justify-content: space-between;
-    padding-block: 0.85rem;
-    border-top: 1px solid var(--line);
-    font-size: 0.73rem;
+  .records li {
+    border-bottom: 1px solid var(--line);
   }
-  .hero-index strong {
-    color: var(--line-strong);
-    font-weight: 500;
-  }
-  .hero-index > a {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    margin-top: 1rem;
-    color: var(--ink-soft);
-    font-size: 0.68rem;
+  .records li > a {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    padding-block: 1.8rem;
     text-decoration: none;
   }
-  .pulse {
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 0 4px var(--accent-soft);
-  }
-  .home-section {
-    padding-block: clamp(4.5rem, 9vw, 7rem);
-  }
-  .home-section > header {
-    display: grid;
-    grid-template-columns: 1fr 2fr auto;
-    gap: 1rem;
-    align-items: end;
-    margin-bottom: 2rem;
-  }
-  .home-section h2,
-  .now-card h2 {
-    margin: 0;
-    font-family: ui-serif, Georgia, serif;
-    font-size: clamp(1.9rem, 4vw, 3rem);
-    font-weight: 530;
-    letter-spacing: -0.045em;
-    line-height: 1.1;
-  }
-  .home-section > header > a {
+  .number,
+  .meta {
     color: var(--ink-soft);
     font-family: var(--font-mono);
-    font-size: 0.68rem;
-    text-decoration: none;
-    text-transform: uppercase;
+    font-size: 0.66rem;
   }
-  .writing-list,
-  .project-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 3rem;
+  .meta {
+    display: flex;
+    gap: 0.85rem;
   }
-  .project-band {
-    border-block: 1px solid var(--line);
-    background: color-mix(in srgb, var(--paper-raised) 40%, transparent);
-  }
-  .project-grid {
-    gap: 1rem;
-  }
-  .lower-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.6fr);
-    gap: clamp(3rem, 9vw, 9rem);
-    align-items: start;
-  }
-  .lower-grid .home-section > header {
-    display: block;
-  }
-  .lower-grid .home-section > header .eyebrow {
-    margin-bottom: 0.6rem;
-  }
-  .now-card {
-    margin-top: clamp(4.5rem, 9vw, 7rem);
-    padding: 1.45rem;
-    border: 1px solid var(--line);
-    border-radius: 0.45rem;
-    background: var(--paper-raised);
-  }
-  .now-card h2 {
-    margin-top: 1.8rem;
-    font-size: 1.65rem;
-  }
-  .now-card > p:not(.eyebrow) {
-    margin: 0.9rem 0 1.4rem;
-    color: var(--ink-soft);
-    font-size: 0.85rem;
-    line-height: 1.65;
-  }
-  .now-card a {
+  .meta span {
     color: var(--accent);
-    font-size: 0.75rem;
-    text-decoration: none;
   }
-  @media (max-width: 48rem) {
-    .hero,
-    .lower-grid {
-      grid-template-columns: 1fr;
-    }
+  .record-copy h3 {
+    margin: 0.45rem 0 0;
+    font-family: var(--font-serif);
+    font-size: clamp(1.2rem, 2.4vw, 1.65rem);
+    font-weight: 560;
+    line-height: 1.35;
+  }
+  .record-copy p {
+    max-width: 48rem;
+    margin: 0.55rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.87rem;
+    line-height: 1.7;
+  }
+  .arrow {
+    color: var(--line-strong);
+  }
+  .records li > a:hover :is(.arrow, h3) {
+    color: var(--accent);
+  }
+  .archive-link {
+    display: inline-block;
+    margin-top: 2rem;
+  }
+  @media (max-width: 44rem) {
     .hero {
       min-height: auto;
     }
-    .writing-list,
-    .project-grid {
+    .forming-inner,
+    .records > header {
       grid-template-columns: 1fr;
+      gap: 1rem;
     }
-    .home-section > header {
-      grid-template-columns: 1fr auto;
+    .records li > a {
+      grid-template-columns: 2rem minmax(0, 1fr);
+      gap: 0.75rem;
     }
-    .home-section > header .eyebrow {
-      grid-column: 1 / -1;
-    }
-    .now-card {
-      margin-top: 0;
+    .records .arrow {
+      display: none;
     }
   }
 </style>

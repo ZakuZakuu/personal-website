@@ -3,23 +3,25 @@
 
 @theme {
   --font-sans:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    sans-serif;
+    'Noto Sans CJK SC', 'Source Han Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-serif:
+    'Noto Serif CJK SC', 'Source Han Serif SC', 'Songti SC', SimSun, ui-serif, Georgia,
+    serif;
   --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 }
 
 :root {
   color-scheme: light;
-  --paper: #f7f6f2;
-  --paper-raised: #ffffff;
-  --ink: #1d211f;
-  --ink-soft: #626862;
-  --line: #dadcd5;
-  --line-strong: #b8bdb5;
-  --accent: #176f5b;
-  --accent-soft: #dcece6;
-  --code-bg: #eceeea;
-  --selection: #c5e3d8;
+  --paper: #f5f1e8;
+  --paper-raised: #faf7f0;
+  --ink: #28231e;
+  --ink-soft: #70685e;
+  --line: #d8d0c3;
+  --line-strong: #746b61;
+  --accent: #8e3027;
+  --accent-soft: #eadbd4;
+  --code-bg: #ebe5db;
+  --selection: #e6cfc4;
   --shadow: 0 16px 42px rgb(36 45 40 / 8%);
   --content: 43rem;
   --wide: 72rem;
@@ -28,16 +30,16 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --paper: #151816;
-  --paper-raised: #1b1f1c;
-  --ink: #e8ebe6;
-  --ink-soft: #a5ada6;
-  --line: #343a35;
-  --line-strong: #505851;
-  --accent: #80cdb4;
-  --accent-soft: #183e33;
-  --code-bg: #202522;
-  --selection: #315b4d;
+  --paper: #191714;
+  --paper-raised: #211e1a;
+  --ink: #ece5d9;
+  --ink-soft: #afa69a;
+  --line: #3b3630;
+  --line-strong: #a99f92;
+  --accent: #d47a68;
+  --accent-soft: #4a2924;
+  --code-bg: #27231e;
+  --selection: #643b31;
   --shadow: 0 16px 46px rgb(0 0 0 / 22%);
 }
 
@@ -59,13 +61,7 @@ body {
   min-width: 20rem;
   min-height: 100vh;
   margin: 0;
-  background:
-    radial-gradient(
-      circle at 20% 0%,
-      color-mix(in srgb, var(--accent) 4%, transparent),
-      transparent 30rem
-    ),
-    var(--paper);
+  background: var(--paper);
 }
 
 ::selection {
@@ -116,14 +112,13 @@ input {
   font-family: var(--font-mono);
   font-size: 0.74rem;
   font-weight: 650;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
 
 .prose {
   min-width: 0;
   color: var(--ink);
-  font-family: ui-serif, Georgia, Cambria, serif;
+  font-family: var(--font-serif);
   font-size: clamp(1.02rem, 1.4vw, 1.11rem);
   line-height: 1.82;
 }
@@ -147,7 +142,7 @@ input {
 .prose h3,
 .prose h4 {
   scroll-margin-top: calc(var(--header-height) + 1.25rem);
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
   text-wrap: balance;
 }
 .prose h2 {
@@ -193,6 +188,7 @@ input {
 .prose a {
   color: var(--accent);
   overflow-wrap: anywhere;
+  text-decoration-line: underline;
 }
 .prose ul,
 .prose ol {

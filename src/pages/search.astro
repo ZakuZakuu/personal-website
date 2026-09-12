@@ -3,28 +3,23 @@ import PageHeader from '@/components/PageHeader.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
 
-<BaseLayout
-  title="Search"
-  description="Search the writing, projects, and courses on this site."
->
+<BaseLayout title="搜索" description="搜索思构录中的文章、项目和课程。">
   <Fragment slot="head">
     <link href="/pagefind/pagefind-component-ui.css" rel="stylesheet" />
     <script is:inline src="/pagefind/pagefind-component-ui.js" type="module"></script>
   </Fragment>
   <PageHeader
-    eyebrow="Search"
-    title="Find an idea again."
-    lede="Search runs entirely in the browser over an index generated during the production build."
+    eyebrow="搜索"
+    title="再次找到一个想法。"
+    lede="搜索在浏览器中完成，索引由网站在构建时生成。"
   />
   <section class="shell search-shell" aria-label="Site search">
     <pagefind-config excerpt-length="28"></pagefind-config>
-    <pagefind-input placeholder="Search notes, articles, projects…"></pagefind-input>
+    <pagefind-input placeholder="搜索笔记、文章或项目…"></pagefind-input>
     <pagefind-summary></pagefind-summary>
     <pagefind-results></pagefind-results>
-    <noscript
-      >Search requires JavaScript. The <a href="/archive/">archive</a> remains available.</noscript
-    >
-    <p class="search-hint">Try a concept, project, or phrase from the archive.</p>
+    <noscript>搜索需要 JavaScript。你仍然可以使用<a href="/archive/">归档</a>。</noscript>
+    <p class="search-hint">试试输入一个概念、项目或曾经读到的短语。</p>
   </section>
 </BaseLayout>
 

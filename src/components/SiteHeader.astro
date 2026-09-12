@@ -7,12 +7,12 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 
 <header class="site-header">
   <div class="shell header-inner">
-    <a class="wordmark" href="/" aria-label={`${site.name} home`}>
+    <a class="wordmark" href="/" aria-label={`${site.name}首页`}>
       <span aria-hidden="true">思构录</span><span class="wordmark-dot" aria-hidden="true">
         /</span
       >
     </a>
-    <nav class="desktop-nav" aria-label="Primary navigation">
+    <nav class="desktop-nav" aria-label="主导航">
       <ul>
         {
           site.nav.map((item) => (
@@ -26,8 +26,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
       </ul>
     </nav>
     <details class="mobile-menu">
-      <summary>Menu</summary>
-      <nav aria-label="Mobile navigation">
+      <summary>菜单</summary>
+      <nav aria-label="移动端导航">
         <ul>
           {
             site.nav.map((item) => (
@@ -44,8 +44,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     <button
       class="theme-toggle"
       type="button"
-      aria-label="Toggle color theme"
-      title="Toggle color theme"
+      aria-label="切换颜色主题"
+      title="切换颜色主题"
     >
       <span class="sun" aria-hidden="true">☼</span><span class="moon" aria-hidden="true"
         >◐</span
@@ -59,11 +59,11 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   const applyTheme = (theme) => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem('theme', theme);
-    button?.setAttribute('aria-label', `Use ${theme === 'dark' ? 'light' : 'dark'} theme`);
+    button?.setAttribute('aria-label', `切换到${theme === 'dark' ? '浅色' : '深色'}主题`);
   };
   button?.setAttribute(
     'aria-label',
-    `Use ${document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'} theme`,
+    `切换到${document.documentElement.dataset.theme === 'dark' ? '浅色' : '深色'}主题`,
   );
   button?.addEventListener('click', () => {
     applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
@@ -89,9 +89,10 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   .wordmark {
     justify-self: start;
     color: var(--ink);
-    font-family: var(--font-mono);
-    font-size: 0.95rem;
-    font-weight: 750;
+    font-family: var(--font-serif);
+    font-size: 1.08rem;
+    font-weight: 650;
+    letter-spacing: 0.16em;
     text-decoration: none;
   }
   .wordmark-dot {

@@ -3,42 +3,33 @@ import PageHeader from '@/components/PageHeader.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
 
-<BaseLayout
-  title="About"
-  description="About Ryan and the purpose of this personal knowledge site."
->
+<BaseLayout title="关于" description="关于思构录，以及记录这些内容的 Ryan。">
   <PageHeader
-    eyebrow="About"
-    title="A place to make the work legible."
-    lede="This page is deliberately incomplete until Ryan supplies the personal details that only he can verify."
+    eyebrow="关于"
+    title="为什么有思构录。"
+    lede="学习和构建的过程很容易散落。这里用来保留问题、尝试、改变过的理解，以及最后做出来的东西。"
   />
   <div class="shell about-grid">
     <aside>
-      <p class="eyebrow">Profile status</p><p>
-        Placeholder copy is visibly marked and safe to replace. No biography, employer,
-        school, location, or credential has been inferred.
+      <p class="eyebrow">记录者</p><p>
+        Ryan。一些更具体的经历和联系方式，会在确定适合公开后再补充。
       </p>
     </aside>
     <div class="prose">
-      <h2>What belongs here</h2>
+      <h2>这里会收录什么</h2>
       <p>
-        A concise introduction should explain what Ryan works on, what he is learning, and
-        what kind of collaboration he welcomes. It should sound like a person, not a résumé
-        summary.
+        我会在这里记录技术写作、学习笔记、课程和项目。它们不一定都是完美的总结，但应该尽量准确地保留当时的问题和理解。
       </p>
-      <h2>How this site is organized</h2>
+      <h2>如何阅读</h2>
       <p>
-        <a href="/writing/">Writing</a> contains focused notes and longer articles. <a
-          href="/courses/">Courses</a
-        > arrange existing notes into learning paths. <a href="/projects/">Projects</a> preserve
-        decisions, failures, and lessons as case studies. The <a href="/now/">Now page</a> is
-        a lightweight current snapshot.
+        <a href="/writing/">文章</a>包含单点笔记和较完整的长文；<a href="/courses/">课程</a>
+        将已有笔记组织成学习路径；<a href="/projects/">项目</a
+        >保留实现中的选择、失败和所得。
       </p>
-      <h2>Contact and public profiles</h2>
+      <h2>关于我</h2>
       <p>
-        Add only the links Ryan wants to make public—for example, an email address, GitHub
-        profile, résumé, or selected social account. These are intentionally absent from the
-        first build.
+        我是
+        Ryan。这里以后会是一段更自然的自我介绍：关于我在学什么、做什么，以及持续关心的问题。简历和公开联系方式可以作为后续入口，但不会变成这个页面的主体。
       </p>
     </div>
   </div>
