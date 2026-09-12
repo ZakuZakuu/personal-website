@@ -2,6 +2,14 @@
 
 Markdown and MDX under `src/content/` are the canonical source. The schemas in `src/content.config.ts` validate frontmatter during `pnpm check` and `pnpm build`.
 
+## AI-assisted drafting
+
+Invoke `$personal-writing` when source material already exists in the current conversation or in supplied files. The skill extracts the author's questions, attempts, observations, decisions, and unresolved points before deciding whether the material fits a note, article, or project log.
+
+New AI-assisted entries remain drafts unless publication is explicitly requested. Review the result for personal claims and missing context; the skill may clarify and organize the author's reasoning, but it must not invent it.
+
+The writing profile lives with the skill at `skills/personal-writing/references/voice-profile.md`. Refine it from writing the author identifies as representative rather than from generic style preferences.
+
 ## Create an entry
 
 ```bash
