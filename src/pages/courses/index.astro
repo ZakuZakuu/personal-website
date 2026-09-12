@@ -14,11 +14,7 @@ const coursesWithCounts = await Promise.all(
 ---
 
 <BaseLayout title="课程" description="由站内笔记组成的有序学习路径。">
-  <PageHeader
-    eyebrow="课程"
-    title="将分散的理解，排成一条学习路径。"
-    lede="课程只负责提供顺序和上下文。每一节仍是站内的独立笔记，不重复保存。"
-  />
+  <PageHeader title="课程" />
   <section class="shell course-list" aria-label="Courses">
     {coursesWithCounts.map(({ course, noteCount }) => <CourseCard {course} {noteCount} />)}
   </section>

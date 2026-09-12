@@ -8,11 +8,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     <link href="/pagefind/pagefind-component-ui.css" rel="stylesheet" />
     <script is:inline src="/pagefind/pagefind-component-ui.js" type="module"></script>
   </Fragment>
-  <PageHeader
-    eyebrow="搜索"
-    title="再次找到一个想法。"
-    lede="搜索在浏览器中完成，索引由网站在构建时生成。"
-  />
+  <PageHeader title="搜索" />
   <section class="shell search-shell" aria-label="Site search">
     <pagefind-config excerpt-length="28"></pagefind-config>
     <pagefind-input placeholder="搜索笔记、文章或项目…"></pagefind-input>

@@ -25,20 +25,7 @@ const records = [
 ---
 
 <BaseLayout>
-  <section class="shell hero">
-    <div class="title-block">
-      <p class="seal" aria-hidden="true">思<br />构</p>
-      <div><p class="eyebrow">一处持续生长的数字手稿</p><h1>思构录</h1></div>
-    </div>
-    <p class="lede">记录学习、构建与理解发生的地方。</p>
-    <p class="introduction">
-      这里收录技术写作、学习笔记和项目实践。与其只保留最后的答案，我更想记下问题如何出现，以及理解如何在过程中改变。
-    </p>
-    <nav aria-label="快速入口">
-      <a href="#records">阅读近期记录 ↓</a><a href="/about/">关于思构录</a>
-    </nav>
-  </section>
-
+  <h1 class="visually-hidden">思构录</h1>
   {
     currentProject && (
       <section class="forming" aria-labelledby="forming-title">
@@ -61,9 +48,8 @@ const records = [
 
   <section class="shell records" id="records" aria-labelledby="records-title">
     <header>
-      <p class="eyebrow">近期记录</p><h2 id="records-title">
-        按它们进入思构录的时间排列。
-      </h2>
+      <h2 id="records-title">近期记录</h2>
+      <a href="/archive/">全部归档 →</a>
     </header>
     <ol>
       {
@@ -98,55 +84,16 @@ const records = [
 </BaseLayout>
 
 <style>
-  .hero {
-    min-height: min(48rem, calc(100svh - var(--header-height)));
-    padding-block: clamp(5.5rem, 13vw, 10rem) clamp(5rem, 10vw, 8rem);
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
-  .title-block {
-    display: flex;
-    gap: clamp(1.25rem, 3vw, 2.5rem);
-    align-items: flex-start;
-  }
-  .seal {
-    width: 2.8rem;
-    margin: 0.15rem 0 0;
-    padding: 0.35rem 0;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    font-family: var(--font-serif);
-    font-size: 0.8rem;
-    line-height: 1.25;
-    text-align: center;
-  }
-  h1 {
-    margin: 0.7rem 0 0;
-    font-family: var(--font-serif);
-    font-size: clamp(4rem, 12vw, 8.8rem);
-    font-weight: 520;
-    letter-spacing: 0.08em;
-    line-height: 0.95;
-  }
-  .lede {
-    max-width: 30em;
-    margin: clamp(2.5rem, 6vw, 4.5rem) 0 0;
-    font-family: var(--font-serif);
-    font-size: clamp(1.35rem, 2.8vw, 2rem);
-    line-height: 1.7;
-  }
-  .introduction {
-    max-width: 40rem;
-    margin: 1.4rem 0 0;
-    color: var(--ink-soft);
-    font-family: var(--font-serif);
-    line-height: 1.9;
-  }
-  .hero nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem 2rem;
-    margin-top: 2.5rem;
-  }
-  .hero nav a,
   .forming a,
   .archive-link {
     color: var(--accent);
@@ -162,7 +109,7 @@ const records = [
     grid-template-columns: 9rem minmax(0, 1fr) auto;
     gap: clamp(2rem, 6vw, 6rem);
     align-items: center;
-    padding-block: 2.5rem;
+    padding-block: 1.5rem;
   }
   .forming-inner span {
     color: var(--line-strong);
@@ -183,20 +130,26 @@ const records = [
     line-height: 1.7;
   }
   .records {
-    padding-block: clamp(5rem, 11vw, 9rem);
+    padding-block: 2.5rem 5rem;
   }
   .records > header {
-    display: grid;
-    grid-template-columns: 9rem minmax(0, 36rem);
-    gap: clamp(2rem, 6vw, 6rem);
-    margin-bottom: 3rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: baseline;
+    margin-bottom: 1.25rem;
   }
   .records h2 {
     margin: 0;
     font-family: var(--font-serif);
-    font-size: clamp(1.65rem, 3.5vw, 2.6rem);
-    font-weight: 520;
-    line-height: 1.4;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 560;
+    line-height: 1.2;
+  }
+  .records > header a {
+    color: var(--accent);
+    font-size: 0.8rem;
+    text-decoration: none;
   }
   .records ol {
     margin: 0;
@@ -211,7 +164,7 @@ const records = [
     display: grid;
     grid-template-columns: 4rem minmax(0, 1fr) auto;
     gap: 1.5rem;
-    padding-block: 1.8rem;
+    padding-block: 1.35rem;
     text-decoration: none;
   }
   .number,
@@ -252,11 +205,7 @@ const records = [
     margin-top: 2rem;
   }
   @media (max-width: 44rem) {
-    .hero {
-      min-height: auto;
-    }
-    .forming-inner,
-    .records > header {
+    .forming-inner {
       grid-template-columns: 1fr;
       gap: 1rem;
     }

@@ -29,11 +29,7 @@ const { label, entries } = Astro.props;
   title={`Writing tagged ${label}`}
   description={`Articles and notes tagged ${label}.`}
 >
-  <PageHeader
-    eyebrow="Tag"
-    title={label}
-    lede={`${entries.length} ${entries.length === 1 ? 'entry follows' : 'entries follow'} this thread.`}
-  />
+  <PageHeader title={label} />
   <section class="shell entries" aria-label={`Writing tagged ${label}`}>
     {entries.map((entry) => <ContentCard entry={entry} />)}
   </section>

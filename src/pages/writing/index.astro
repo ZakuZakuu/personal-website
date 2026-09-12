@@ -10,11 +10,7 @@ const notes = writing.filter((entry) => entry.collection === 'notes');
 ---
 
 <BaseLayout title="文章" description="关于技术、系统与持续学习的文章和笔记。">
-  <PageHeader
-    eyebrow="文章与笔记"
-    title="在不同尺度上，保留一次理解。"
-    lede="文章将若干想法连成完整论述；笔记则聚焦一个问题，记录理解发生变化的时刻。"
-  >
+  <PageHeader title="文章与笔记">
     <nav class="section-links" aria-label="Writing sections">
       <a href="#articles">文章 <span>{articles.length}</span></a><a href="#notes"
         >笔记 <span>{notes.length}</span></a

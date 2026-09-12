@@ -7,11 +7,7 @@ const tags = getTagIndex(await getWriting());
 ---
 
 <BaseLayout title="Tags" description="Browse writing by subject.">
-  <PageHeader
-    eyebrow="Tags"
-    title="Browse the recurring threads."
-    lede="Tags stay lightweight: they provide useful entry points without pretending the archive is a complete knowledge graph."
-  />
+  <PageHeader title="标签" />
   <nav class="shell tag-index" aria-label="All tags">
     {
       tags.map((tag) => (

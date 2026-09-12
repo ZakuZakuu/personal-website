@@ -58,9 +58,6 @@ const minutes = estimateReadingTime(entry.body ?? '');
     <div class="article-grid shell">
       <aside class="toc-column"><TableOfContents headings={headings} /></aside>
       <div class="prose"><slot /></div>
-      <aside class="margin-note" aria-label="Content type">
-        <span>{kind === 'Article' ? 'Long-form synthesis' : 'Focused understanding'}</span>
-      </aside>
     </div>
 
     {
@@ -104,12 +101,12 @@ const minutes = estimateReadingTime(entry.body ?? '');
 
 <style>
   .article-shell {
-    padding-top: clamp(3.5rem, 8vw, 6.5rem);
+    padding-top: 2.25rem;
   }
   .breadcrumbs {
     display: flex;
     gap: 0.55rem;
-    margin-bottom: 2.7rem;
+    margin-bottom: 1.5rem;
     color: var(--ink-soft);
     font-family: var(--font-mono);
     font-size: 0.69rem;
@@ -119,9 +116,9 @@ const minutes = estimateReadingTime(entry.body ?? '');
   }
   h1 {
     max-width: 18ch;
-    margin: 0.9rem 0 0;
+    margin: 0.5rem 0 0;
     font-family: ui-serif, Georgia, serif;
-    font-size: clamp(2.65rem, 7vw, 5rem);
+    font-size: clamp(2rem, 5vw, 3.25rem);
     font-weight: 520;
     letter-spacing: -0.055em;
     line-height: 1.02;
@@ -129,7 +126,7 @@ const minutes = estimateReadingTime(entry.body ?? '');
   }
   .description {
     max-width: 39rem;
-    margin: 1.5rem 0 0;
+    margin: 1rem 0 0;
     color: var(--ink-soft);
     font-size: clamp(1.05rem, 2vw, 1.25rem);
     line-height: 1.65;
@@ -146,23 +143,14 @@ const minutes = estimateReadingTime(entry.body ?? '');
   }
   .article-grid {
     display: grid;
-    grid-template-columns: minmax(8rem, 13rem) minmax(0, var(--content)) minmax(5rem, 1fr);
+    grid-template-columns: minmax(8rem, 13rem) minmax(0, var(--content)) minmax(0, 1fr);
     gap: clamp(2rem, 5vw, 5rem);
-    margin-top: clamp(3.5rem, 8vw, 6rem);
+    margin-top: 2.5rem;
   }
   .toc-column {
     position: sticky;
     top: calc(var(--header-height) + 2rem);
     align-self: start;
-  }
-  .margin-note {
-    padding-top: 0.2rem;
-    color: var(--ink-soft);
-    font-family: var(--font-mono);
-    font-size: 0.64rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    writing-mode: vertical-rl;
   }
   .sequence {
     display: grid;

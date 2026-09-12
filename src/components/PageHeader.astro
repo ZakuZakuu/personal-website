@@ -1,37 +1,31 @@
 ---
 interface Props {
-  eyebrow: string;
   title: string;
-  lede: string;
 }
-const { eyebrow, title, lede } = Astro.props;
+const { title } = Astro.props;
 ---
 
 <header class="page-header shell">
-  <p class="eyebrow">{eyebrow}</p>
   <h1>{title}</h1>
-  <p class="lede">{lede}</p>
   <slot />
 </header>
 
 <style>
   .page-header {
-    padding-block: clamp(4.5rem, 9vw, 7rem) clamp(3rem, 6vw, 5rem);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    align-items: baseline;
+    padding-block: 2.25rem 1.5rem;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 2rem;
   }
   h1 {
-    max-width: 15ch;
-    margin: 0.85rem 0 0;
+    margin: 0;
     font-family: var(--font-serif);
-    font-size: clamp(2.8rem, 7vw, 5.7rem);
-    font-weight: 520;
-    letter-spacing: -0.06em;
-    line-height: 0.98;
-  }
-  .lede {
-    max-width: 43rem;
-    margin: 1.5rem 0 0;
-    color: var(--ink-soft);
-    font-size: clamp(1.05rem, 2vw, 1.3rem);
-    line-height: 1.65;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 560;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
   }
 </style>

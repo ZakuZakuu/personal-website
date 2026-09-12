@@ -8,11 +8,7 @@ const projects = await getProjects();
 ---
 
 <BaseLayout title="项目" description="记录项目的缘起、架构、取舍、失败与所得。">
-  <PageHeader
-    eyebrow="项目"
-    title="不只留下结果，也留下选择。"
-    lede="记录一个项目为何存在、如何工作、在哪里失败，以及后来发生了什么变化。"
-  />
+  <PageHeader title="项目" />
   <section class="shell project-grid" aria-label="Project case studies">
     {projects.map((project) => <ProjectCard {project} />)}
   </section>

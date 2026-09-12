@@ -9,7 +9,7 @@ const byYear = Map.groupBy(writing, (entry) => entry.data.date.getUTCFullYear())
 ---
 
 <BaseLayout title="归档" description="按首次发布时间整理的文章与笔记。">
-  <PageHeader eyebrow="归档" title="依时而录。" lede="按内容首次进入思构录的时间排列。" />
+  <PageHeader title="归档" />
   <div class="shell archive">
     {
       [...byYear.entries()].map(([year, entries]) => (
