@@ -17,7 +17,7 @@ for (const route of representativeRoutes) {
     const response = await page.goto(route);
     expect(response?.ok()).toBeTruthy();
     await expect(page.locator('main')).toBeVisible();
-    await expect(page).toHaveTitle(/Ryan/);
+    await expect(page).toHaveTitle(/思构录/);
 
     const sizes = await page.evaluate(() => ({
       viewport: document.documentElement.clientWidth,
