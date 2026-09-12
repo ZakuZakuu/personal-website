@@ -63,5 +63,5 @@ test('mobile navigation exposes every primary destination', async ({ page, isMob
   await page.getByText('菜单', { exact: true }).click();
   const navigation = page.getByRole('navigation', { name: '移动端导航' });
   await expect(navigation).toBeVisible();
-  await expect(navigation.getByRole('link')).toHaveCount(5);
+  await expect(navigation.getByRole('link')).toHaveCount(4);
 });

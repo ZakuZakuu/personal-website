@@ -5,9 +5,8 @@ export const site = {
   author: 'Ryan',
   nav: [
     { href: '/', label: '首页' },
-    { href: '/writing/', label: '文章' },
-    { href: '/projects/', label: '项目' },
-    { href: '/courses/', label: '课程' },
+    { href: '/writing/', label: '全部' },
+    { href: '/tags/', label: '标签' },
     { href: '/about/', label: '关于' },
   ],
 } as const;

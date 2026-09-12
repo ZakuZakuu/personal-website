@@ -1,0 +1,100 @@
+---
+import { formatDate, type ContentRecord } from '@/lib/content';
+
+interface Props {
+  records: ContentRecord[];
+  numbered?: boolean;
+}
+
+const { records, numbered = false } = Astro.props;
+---
+
+<ol class:list={['record-list', { numbered }]}>
+  {
+    records.map((record, index) => (
+      <li>
+        <a href={record.href}>
+          {numbered && <span class="number">{String(index + 1).padStart(2, '0')}</span>}
+          <div class="record-copy">
+            <div class="meta">
+              <span>{record.kind}</span>
+              <time datetime={record.date.toISOString()}>{formatDate(record.date)}</time>
+            </div>
+            <h3>{record.title}</h3>
+            <p>{record.description}</p>
+          </div>
+          <span class="arrow" aria-hidden="true">
+            ↗
+          </span>
+        </a>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .record-list {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--ink);
+    list-style: none;
+  }
+  li {
+    border-bottom: 1px solid var(--line);
+  }
+  a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    padding-block: 1.25rem;
+    text-decoration: none;
+  }
+  .numbered a {
+    grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+  }
+  .number,
+  .meta {
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+  }
+  .number {
+    padding-top: 1.45rem;
+  }
+  .meta {
+    display: flex;
+    gap: 0.8rem;
+  }
+  .meta span {
+    color: var(--accent);
+  }
+  h3 {
+    margin: 0.4rem 0 0;
+    font-family: var(--font-serif);
+    font-size: clamp(1.18rem, 2.2vw, 1.55rem);
+    font-weight: 590;
+    line-height: 1.35;
+  }
+  p {
+    max-width: 45rem;
+    margin: 0.45rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.84rem;
+    line-height: 1.65;
+  }
+  .arrow {
+    color: var(--line-strong);
+  }
+  a:hover :is(.arrow, h3) {
+    color: var(--accent);
+  }
+  @media (max-width: 38rem) {
+    .numbered a {
+      grid-template-columns: 1.75rem minmax(0, 1fr);
+      gap: 0.65rem;
+    }
+    .arrow {
+      display: none;
+    }
+  }
+</style>

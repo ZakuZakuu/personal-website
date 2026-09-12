@@ -1,76 +1,39 @@
 ---
-import ContentCard from '@/components/ContentCard.astro';
 import PageHeader from '@/components/PageHeader.astro';
-import { getWriting } from '@/lib/content';
+import RecordList from '@/components/RecordList.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getContentRecords } from '@/lib/content';
 
-const writing = await getWriting();
-const articles = writing.filter((entry) => entry.collection === 'articles');
-const notes = writing.filter((entry) => entry.collection === 'notes');
+const records = await getContentRecords();
 ---
 
-<BaseLayout title="文章" description="关于技术、系统与持续学习的文章和笔记。">
-  <PageHeader title="文章与笔记">
-    <nav class="section-links" aria-label="Writing sections">
-      <a href="#articles">文章 <span>{articles.length}</span></a><a href="#notes"
-        >笔记 <span>{notes.length}</span></a
-      ><a href="/tags/">标签</a><a href="/search/">搜索</a>
+<BaseLayout title="全部记录" description="思构录中的全部文章、笔记与项目记录。">
+  <PageHeader title="全部记录">
+    <nav class="tools" aria-label="记录浏览工具">
+      <span>共 {records.length} 篇</span><a href="/tags/">按标签浏览</a><a href="/archive/"
+        >按年份归档</a
+      ><a href="/search/">搜索</a>
     </nav>
   </PageHeader>
-  <div class="shell writing-grid">
-    <section id="articles" aria-labelledby="articles-title">
-      <div class="section-heading">
-        <p class="eyebrow">长文</p><h2 id="articles-title">文章</h2>
-      </div>
-      <div>{articles.map((entry) => <ContentCard entry={entry} />)}</div>
-    </section>
-    <section id="notes" aria-labelledby="notes-title">
-      <div class="section-heading">
-        <p class="eyebrow">单点记录</p><h2 id="notes-title">笔记</h2>
-      </div>
-      <div>{notes.map((entry) => <ContentCard entry={entry} />)}</div>
-    </section>
-  </div>
+  <section class="shell records" data-pagefind-body>
+    <RecordList {records} numbered />
+  </section>
 </BaseLayout>
 
 <style>
-  .section-links {
+  .tools {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.7rem 1.4rem;
-    margin-top: 2rem;
-  }
-  .section-links a {
+    gap: 0.6rem 1.2rem;
+    margin-left: auto;
     color: var(--ink-soft);
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
+  }
+  .tools a {
     text-decoration: none;
-    text-transform: uppercase;
   }
-  .section-links a:hover {
-    color: var(--accent);
-  }
-  .section-links span {
-    color: var(--line-strong);
-  }
-  .writing-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.8fr);
-    gap: clamp(3rem, 8vw, 8rem);
-  }
-  .section-heading {
-    min-height: 7rem;
-  }
-  h2 {
-    margin: 0.45rem 0 0;
-    font-family: var(--font-serif);
-    font-size: 2.15rem;
-    font-weight: 540;
-    letter-spacing: -0.04em;
-  }
-  @media (max-width: 50rem) {
-    .writing-grid {
-      grid-template-columns: 1fr;
-    }
+  .records {
+    max-width: 58rem;
   }
 </style>

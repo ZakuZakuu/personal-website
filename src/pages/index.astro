@@ -1,86 +1,63 @@
 ---
+import RecordList from '@/components/RecordList.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { formatDate, getProjects, getWriting, writingHref } from '@/lib/content';
+import { getContentRecords, getProjects, getTagIndex, getWriting } from '@/lib/content';
 
-const [writing, projects] = await Promise.all([getWriting(), getProjects()]);
+const [records, projects, writing] = await Promise.all([
+  getContentRecords(),
+  getProjects(),
+  getWriting(),
+]);
 const currentProject = projects[0];
-const records = [
-  ...writing.map((entry) => ({
-    kind: entry.collection === 'articles' ? '文章' : '笔记',
-    title: entry.data.title,
-    description: entry.data.description,
-    date: entry.data.date,
-    href: writingHref(entry),
-  })),
-  ...projects.map((entry) => ({
-    kind: '项目',
-    title: entry.data.title,
-    description: entry.data.description,
-    date: entry.data.date,
-    href: `/projects/${entry.id}/`,
-  })),
-]
-  .sort((a, b) => b.date.valueOf() - a.date.valueOf())
-  .slice(0, 8);
+const tags = getTagIndex(writing).slice(0, 10);
 ---
 
 <BaseLayout>
   <h1 class="visually-hidden">思构录</h1>
-  {
-    currentProject && (
-      <section class="forming" aria-labelledby="forming-title">
-        <div class="shell forming-inner">
-          <div>
-            <>
-              <p class="eyebrow">正在形成</p>
-              <span>NOW</span>
-            </>
-          </div>
-          <div class="forming-copy">
+  <div class="shell front-page">
+    <section aria-labelledby="records-title">
+      <header class="section-header">
+        <div><span>卷一</span><h2 id="records-title">近期记录</h2></div>
+        <a href="/writing/">全部记录 →</a>
+      </header>
+      <RecordList records={records.slice(0, 10)} numbered />
+    </section>
+
+    <aside class="side-column" aria-label="站点索引">
+      {
+        currentProject && (
+          <section class="desk-note" aria-labelledby="forming-title">
+            <p class="section-label">案头 · 正在形成</p>
             <h2 id="forming-title">{currentProject.data.title}</h2>
             <p>{currentProject.data.description}</p>
-          </div>
-          <a href={`/projects/${currentProject.id}/`}>查看项目 →</a>
-        </div>
-      </section>
-    )
-  }
-
-  <section class="shell records" id="records" aria-labelledby="records-title">
-    <header>
-      <h2 id="records-title">近期记录</h2>
-      <a href="/archive/">全部归档 →</a>
-    </header>
-    <ol>
-      {
-        records.map((record, index) => (
-          <li>
-            <a href={record.href}>
-              <span class="number">{String(index + 1).padStart(2, '0')}</span>
-              <div class="record-copy">
-                <div class="meta">
-                  <>
-                    <span>{record.kind}</span>
-                    <time datetime={record.date.toISOString()}>
-                      {formatDate(record.date)}
-                    </time>
-                  </>
-                </div>
-                <>
-                  <h3>{record.title}</h3>
-                  <p>{record.description}</p>
-                </>
-              </div>
-              <span class="arrow" aria-hidden="true">
-                ↗
-              </span>
-            </a>
-          </li>
-        ))
+            <a href={`/projects/${currentProject.id}/`}>查看记录 →</a>
+          </section>
+        )
       }
-    </ol>
-    <a class="archive-link" href="/archive/">查看全部归档 →</a>
-  </section>
+      <section class="tag-index" aria-labelledby="tag-title">
+        <div class="side-heading">
+          <h2 id="tag-title">索引</h2><a href="/tags/">全部</a>
+        </div>
+        <ul>
+          {
+            tags.map((tag) => (
+              <li>
+                <a href={`/tags/${tag.slug}/`}>
+                  <>
+                    <span>{tag.label}</span>
+                    <small>{tag.count}</small>
+                  </>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+      <nav class="utility-links" aria-label="其他入口">
+        <a href="/now/">近况</a><a href="/archive/">按年份归档</a><a href="/rss.xml">RSS</a>
+      </nav>
+    </aside>
+  </div>
 </BaseLayout>
 
 <style>
@@ -94,127 +71,137 @@ const records = [
     white-space: nowrap;
     border: 0;
   }
-  .forming a,
-  .archive-link {
-    color: var(--accent);
-    font-size: 0.8rem;
-    text-decoration: none;
-  }
-  .forming {
-    border-block: 1px solid var(--line);
-    background: color-mix(in srgb, var(--paper-raised) 64%, transparent);
-  }
-  .forming-inner {
+  .front-page {
     display: grid;
-    grid-template-columns: 9rem minmax(0, 1fr) auto;
-    gap: clamp(2rem, 6vw, 6rem);
-    align-items: center;
-    padding-block: 1.5rem;
-  }
-  .forming-inner span {
-    color: var(--line-strong);
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-  }
-  .forming-copy h2 {
-    margin: 0;
-    font-family: var(--font-serif);
-    font-size: clamp(1.45rem, 3vw, 2.1rem);
-    font-weight: 560;
-  }
-  .forming-copy p {
-    max-width: 42rem;
-    margin: 0.55rem 0 0;
-    color: var(--ink-soft);
-    font-size: 0.88rem;
-    line-height: 1.7;
-  }
-  .records {
+    grid-template-columns: minmax(0, 1fr) 17rem;
+    gap: clamp(2.5rem, 6vw, 5.5rem);
     padding-block: 2.5rem 5rem;
   }
-  .records > header {
+  .section-header,
+  .section-header > div,
+  .side-heading {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
     align-items: baseline;
-    margin-bottom: 1.25rem;
   }
-  .records h2 {
+  .section-header {
+    margin-bottom: 1.2rem;
+  }
+  .section-header > div {
+    justify-content: flex-start;
+  }
+  .section-header span,
+  .section-label {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+  }
+  h2 {
     margin: 0;
     font-family: var(--font-serif);
-    font-size: clamp(1.8rem, 4vw, 2.5rem);
-    font-weight: 560;
-    line-height: 1.2;
+    font-size: 1.8rem;
+    font-weight: 600;
   }
-  .records > header a {
-    color: var(--accent);
-    font-size: 0.8rem;
+  a {
+    font-size: 0.76rem;
     text-decoration: none;
   }
-  .records ol {
-    margin: 0;
-    padding: 0;
-    border-top: 1px solid var(--line-strong);
-    list-style: none;
+  .side-column {
+    border-left: 1px solid var(--line);
+    padding-left: 1.5rem;
   }
-  .records li {
+  .side-column section {
+    padding-bottom: 2rem;
     border-bottom: 1px solid var(--line);
   }
-  .records li > a {
-    display: grid;
-    grid-template-columns: 4rem minmax(0, 1fr) auto;
-    gap: 1.5rem;
-    padding-block: 1.35rem;
-    text-decoration: none;
+  .side-column section + section {
+    padding-top: 2rem;
   }
-  .number,
-  .meta {
+  .desk-note {
+    position: relative;
+  }
+  .desk-note::after {
+    position: absolute;
+    top: -0.35rem;
+    right: 0;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    content: '构';
+    font-family: var(--font-serif);
+    line-height: 2rem;
+    text-align: center;
+    transform: rotate(3deg);
+  }
+  .desk-note h2 {
+    margin-top: 1rem;
+    padding-right: 2.25rem;
+    font-size: 1.2rem;
+    line-height: 1.45;
+  }
+  .desk-note > p:not(.section-label) {
+    margin: 0.65rem 0 1rem;
+    color: var(--ink-soft);
+    font-family: var(--font-serif);
+    font-size: 0.86rem;
+    line-height: 1.75;
+  }
+  .side-heading h2 {
+    font-size: 1.15rem;
+  }
+  .tag-index ul {
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tag-index li + li {
+    border-top: 1px dotted var(--line);
+  }
+  .tag-index li a {
+    display: flex;
+    justify-content: space-between;
+    padding-block: 0.48rem;
+    font-size: 0.78rem;
+  }
+  .tag-index small {
     color: var(--ink-soft);
     font-family: var(--font-mono);
-    font-size: 0.66rem;
   }
-  .meta {
+  .utility-links {
     display: flex;
-    gap: 0.85rem;
+    flex-wrap: wrap;
+    gap: 0.6rem 1rem;
+    padding-top: 1.5rem;
   }
-  .meta span {
-    color: var(--accent);
-  }
-  .record-copy h3 {
-    margin: 0.45rem 0 0;
-    font-family: var(--font-serif);
-    font-size: clamp(1.2rem, 2.4vw, 1.65rem);
-    font-weight: 560;
-    line-height: 1.35;
-  }
-  .record-copy p {
-    max-width: 48rem;
-    margin: 0.55rem 0 0;
-    color: var(--ink-soft);
-    font-size: 0.87rem;
-    line-height: 1.7;
-  }
-  .arrow {
-    color: var(--line-strong);
-  }
-  .records li > a:hover :is(.arrow, h3) {
-    color: var(--accent);
-  }
-  .archive-link {
-    display: inline-block;
-    margin-top: 2rem;
-  }
-  @media (max-width: 44rem) {
-    .forming-inner {
+  @media (max-width: 48rem) {
+    .front-page {
       grid-template-columns: 1fr;
-      gap: 1rem;
     }
-    .records li > a {
-      grid-template-columns: 2rem minmax(0, 1fr);
-      gap: 0.75rem;
+    .side-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      border-top: 1px solid var(--ink);
+      border-left: 0;
+      padding-top: 2rem;
+      padding-left: 0;
     }
-    .records .arrow {
-      display: none;
+    .side-column section + section {
+      padding-top: 0;
+    }
+    .utility-links {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 34rem) {
+    .side-column {
+      grid-template-columns: 1fr;
+    }
+    .utility-links {
+      grid-column: auto;
     }
   }
 </style>

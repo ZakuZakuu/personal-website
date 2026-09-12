@@ -8,9 +8,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 <header class="site-header">
   <div class="shell header-inner">
     <a class="wordmark" href="/" aria-label={`${site.name}首页`}>
-      <span aria-hidden="true">思构录</span><span class="wordmark-dot" aria-hidden="true">
-        /</span
-      >
+      <span class="seal" aria-hidden="true">思</span><span aria-hidden="true">思构录</span>
     </a>
     <nav class="desktop-nav" aria-label="主导航">
       <ul>
@@ -51,6 +49,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
         >◐</span
       >
     </button>
+    <a class="search-link" href="/search/" aria-label="搜索">⌕</a>
   </div>
 </header>
 
@@ -76,7 +75,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     z-index: 50;
     top: 0;
     height: var(--header-height);
-    border-bottom: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+    border-block: 1px solid color-mix(in srgb, var(--line-strong) 65%, transparent);
     background: color-mix(in srgb, var(--paper) 88%, transparent);
     backdrop-filter: blur(14px);
   }
@@ -87,6 +86,9 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     height: 100%;
   }
   .wordmark {
+    display: inline-flex;
+    gap: 0.65rem;
+    align-items: center;
     justify-self: start;
     color: var(--ink);
     font-family: var(--font-serif);
@@ -95,8 +97,15 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     letter-spacing: 0.16em;
     text-decoration: none;
   }
-  .wordmark-dot {
+  .seal {
+    display: inline-grid;
+    width: 1.55rem;
+    height: 1.55rem;
+    place-items: center;
+    border: 1px solid var(--accent);
     color: var(--accent);
+    font-size: 0.76rem;
+    letter-spacing: 0;
   }
   .mobile-menu {
     display: none;
@@ -127,6 +136,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   .theme-toggle {
     display: inline-grid;
     justify-self: end;
+    margin-right: 2.8rem;
     width: 2.2rem;
     height: 2.2rem;
     place-items: center;
@@ -135,6 +145,13 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     background: transparent;
     color: var(--ink-soft);
     cursor: pointer;
+  }
+  .search-link {
+    position: absolute;
+    right: max(1rem, calc((100vw - var(--wide)) / 2));
+    color: var(--ink-soft);
+    font-size: 1.2rem;
+    text-decoration: none;
   }
   .theme-toggle:hover {
     border-color: var(--line-strong);
@@ -153,6 +170,9 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     .header-inner {
       grid-template-columns: 1fr auto auto;
       gap: 0.75rem;
+    }
+    .search-link {
+      display: none;
     }
     .desktop-nav {
       display: none;
@@ -209,6 +229,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     .theme-toggle {
       width: 2rem;
       height: 2rem;
+      margin-right: 0;
     }
     .wordmark {
       font-size: 0.95rem;

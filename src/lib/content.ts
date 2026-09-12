@@ -7,6 +7,14 @@ export type NoteEntry = CollectionEntry<'notes'>;
 export type WritingEntry = ArticleEntry | NoteEntry;
 export type ProjectEntry = CollectionEntry<'projects'>;
 export type CourseEntry = CollectionEntry<'courses'>;
+export interface ContentRecord {
+  kind: '文章' | '笔记' | '项目';
+  title: string;
+  description: string;
+  date: Date;
+  href: string;
+  tags: string[];
+}
 
 type DatedEntry = { data: { date: Date } };
 type DraftableEntry = { data: { draft: boolean } };
@@ -29,6 +37,28 @@ export async function getWriting(): Promise<WritingEntry[]> {
 
 export async function getProjects(): Promise<ProjectEntry[]> {
   return sortNewest(await getCollection('projects', ({ data }) => !data.draft));
+}
+
+export async function getContentRecords(): Promise<ContentRecord[]> {
+  const [writing, projects] = await Promise.all([getWriting(), getProjects()]);
+  return [
+    ...writing.map((entry): ContentRecord => ({
+      kind: entry.collection === 'articles' ? '文章' : '笔记',
+      title: entry.data.title,
+      description: entry.data.description,
+      date: entry.data.date,
+      href: writingHref(entry),
+      tags: entry.data.tags,
+    })),
+    ...projects.map((entry): ContentRecord => ({
+      kind: '项目',
+      title: entry.data.title,
+      description: entry.data.description,
+      date: entry.data.date,
+      href: `/projects/${entry.id}/`,
+      tags: entry.data.tags,
+    })),
+  ].sort((a, b) => b.date.valueOf() - a.date.valueOf());
 }
 
 export async function getCourses(): Promise<CourseEntry[]> {
