@@ -1,10 +1,12 @@
 ---
+import { site } from '@/site.config';
+
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
   <div class="shell footer-inner">
-    <p>© {year} Ryan. Built as a durable home for things learned and made.</p>
+    <p>© {year} {site.author} · {site.name}. Thinking, making, and recording.</p>
     <nav aria-label="Secondary navigation">
       <a href="/now/">Now</a>
       <a href="/archive/">Archive</a>

@@ -1,8 +1,8 @@
 export const site = {
-  name: 'Ryan',
-  title: 'Ryan — Learning, building, and writing',
+  name: '思构录',
+  title: '思构录 — Thinking, Making, Recording',
   description:
-    'A personal knowledge site for technical writing, learning notes, courses, and projects.',
+    'A place for thinking, making, and recording—across technical writing, learning notes, courses, and projects.',
   author: 'Ryan',
   nav: [
     { href: '/', label: 'Home' },

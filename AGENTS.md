@@ -534,6 +534,13 @@ rather than under:
 
 Ensure commands work in a Linux environment.
 
+## Local Proxy
+
+This WSL environment uses `clashctl` with a local proxy at `127.0.0.1:7890`.
+If a sandboxed command reports a proxy connection error, retry it with approved
+network access. Treat GitHub authentication as invalid only after `gh api user`
+also fails with normal network access.
+
 ---
 
 # Social Pipeline

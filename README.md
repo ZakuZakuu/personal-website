@@ -1,4 +1,4 @@
-# Ryan's personal site
+# 思构录
 
 A static-first personal content hub for technical writing, learning notes, courses, and project case studies. The repository is intentionally content-first: Markdown and MDX are the source of truth, and the generated site requires no database or application server.
 
