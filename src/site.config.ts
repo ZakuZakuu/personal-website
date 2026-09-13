@@ -1,7 +1,7 @@
 export const site = {
-  name: '思构录',
-  title: '思构录 — 记录学习、构建与理解发生的地方',
-  description: '记录学习、构建与理解发生的地方，收录技术文章、学习笔记、课程与项目。',
+  name: 'Rabbit Hole',
+  title: 'Rabbit Hole',
+  description: '个人写作、学习记录与项目实践。',
   author: 'Ryan',
   nav: [
     { href: '/', label: '首页' },
