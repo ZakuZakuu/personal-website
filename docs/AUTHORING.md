@@ -6,7 +6,7 @@ Markdown and MDX under `src/content/` are the canonical source. The schemas in `
 
 Invoke `$personal-writing` when source material already exists in the current conversation or in supplied files. The skill extracts the author's questions, attempts, observations, decisions, and unresolved points before deciding whether the material fits a note, article, or project log.
 
-New AI-assisted entries remain drafts unless publication is explicitly requested. Review the result for personal claims and missing context; the skill may clarify and organize the author's reasoning, but it must not invent it.
+AI-assisted entries default to a publication-ready pull request: the generated entry is public in source, but it reaches the production site only when you review and merge that PR. Say “只生成草稿” or “不要发 PR” when you instead want a local `draft: true` file. Review personal claims and missing context before merging; the skill may clarify and organize the author's reasoning, but it must not invent it.
 
 The writing profile lives with the skill at `skills/personal-writing/references/voice-profile.md`. Refine it from writing the author identifies as representative rather than from generic style preferences.
 
