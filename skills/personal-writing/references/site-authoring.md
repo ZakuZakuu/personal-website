@@ -6,7 +6,7 @@ Use this reference only when the requested output belongs in the personal-site r
 2. Keep the public information architecture unified even though source collections retain editorial meaning.
 3. Prefer an English URL slug that remains stable if the displayed Chinese title changes. Ask for a slug only when no concise, unambiguous one can be inferred.
 4. Use the minimum metadata supported by the target collection. For the default review-PR delivery, use `draft: false` (or omit it when the schema defaults to public). Use `draft: true` only when the author explicitly requests a local/private draft. Omit `demo` for real content.
-5. Keep images beside the entry in a descriptive content directory when assets exist. Convert Obsidian embeds into valid site assets or leave clearly reported unresolved markers when the files were not supplied.
+5. When supplied images, screenshots, or diagrams materially support the entry, use MDX and keep them beside the entry in a descriptive content directory. Import each local asset and render it with `MediaFigure` from `src/components/MediaFigure.astro`; write accurate `alt` text and add a `caption` when it helps explain the evidence. Prefer WebP or AVIF for published raster images. Do not add decorative images or invent a visual when none was supplied. Convert Obsidian embeds into valid site assets or leave clearly reported unresolved markers when the files were not supplied.
 6. Do not duplicate a note inside a course. Course membership remains metadata-driven.
 7. Before declaring the entry ready, run `pnpm check`, `pnpm lint`, `pnpm test`, and `pnpm build`. Use browser tests when markup, shared components, or layouts changed.
 8. Default delivery is a review PR:
