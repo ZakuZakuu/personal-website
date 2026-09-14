@@ -55,7 +55,7 @@ pnpm new:project "Project name"
 pnpm new:course "Course name"
 ```
 
-See [docs/AUTHORING.md](docs/AUTHORING.md) for relationships, assets, drafts, and the publishing checklist. AI-assisted drafting guidance lives in `.blog/STYLE.md` and one conversation-to-draft prompt; it deliberately separates Ryan's own reasoning from added background.
+See [docs/AUTHORING.md](docs/AUTHORING.md) for relationships, assets, drafts, the publishing checklist, and a ready-to-copy Chinese prompt for AI-assisted writing.
 
 ## Architecture
 
@@ -76,11 +76,6 @@ Important trade-offs are recorded in [docs/DECISIONS.md](docs/DECISIONS.md).
 
 GitHub Actions repeats the type/content checks, formatting check, unit tests, production build, desktop/mobile browser tests, and Axe accessibility audit on pushes and pull requests.
 
-## Replace before deployment
+## Before publishing new content
 
-Demo entries carry `demo: true` and display a visible label. They validate the layouts without claiming personal history. Before the first real deployment:
-
-1. replace or draft the demo content;
-2. add only the public profile and contact links Ryan wants to expose;
-3. set `SITE_URL` to the final canonical origin;
-4. replace the default social preview if desired.
+Use `draft: true` for local-only work. Content delivered through the default AI-assisted workflow is reviewed in a pull request and becomes public only after that PR is merged.
