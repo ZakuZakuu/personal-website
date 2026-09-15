@@ -26,9 +26,9 @@ export default defineConfig({
             behavior: 'append',
             properties: {
               className: ['heading-anchor'],
-              ariaLabel: 'Link to this section',
+              ariaLabel: '链接到本节',
             },
-            content: { type: 'text', value: '#' },
+            content: { type: 'text', value: '' },
           },
         ],
       ],
