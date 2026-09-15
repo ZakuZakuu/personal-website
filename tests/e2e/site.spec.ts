@@ -3,10 +3,8 @@ import { expect, test } from '@playwright/test';
 const representativeRoutes = [
   '/',
   '/writing/',
-  '/writing/durable-technical-notes/',
-  '/writing/tokenization-is-a-design-choice/',
-  '/projects/personal-content-hub/',
-  '/courses/language-model-foundations/',
+  '/projects/learn-dsh-interactive-harness-course/',
+  '/courses/',
   '/about/',
   '/now/',
   '/search/',
@@ -37,23 +35,13 @@ test('theme choice persists after navigation', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 });
 
-test('long-form writing exposes a table of contents and section links', async ({
-  page,
-}) => {
-  await page.goto('/writing/durable-technical-notes/');
-  await expect(page.getByRole('navigation', { name: 'On this page' })).toBeVisible();
-  await expect(
-    page.getByRole('link', { name: 'Link to this section' }).first(),
-  ).toHaveAttribute('href', /^#/);
-});
-
 test('the production search component is registered', async ({ page }) => {
   await page.goto('/search/');
   await expect(page.locator('pagefind-input')).toBeVisible();
   await expect
     .poll(() => page.evaluate(() => Boolean(customElements.get('pagefind-input'))))
     .toBe(true);
-  await page.locator('pagefind-input input').fill('tokenization');
+  await page.locator('pagefind-input input').fill('Harness');
   await expect(page.locator('pagefind-results a').first()).toBeVisible();
 });
 
