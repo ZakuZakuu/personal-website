@@ -4,16 +4,17 @@ import { slugifyTag } from './text';
 
 export type ArticleEntry = CollectionEntry<'articles'>;
 export type NoteEntry = CollectionEntry<'notes'>;
-export type WritingEntry = ArticleEntry | NoteEntry;
 export type ProjectEntry = CollectionEntry<'projects'>;
+export type Entry = ArticleEntry | NoteEntry | ProjectEntry;
+export type WritingEntry = ArticleEntry | NoteEntry;
 export type CourseEntry = CollectionEntry<'courses'>;
 export interface ContentRecord {
-  kind: '文章' | '笔记' | '项目';
   title: string;
   description: string;
   date: Date;
   href: string;
   tags: string[];
+  series: string[];
 }
 
 type DatedEntry = { data: { date: Date } };
@@ -39,26 +40,23 @@ export async function getProjects(): Promise<ProjectEntry[]> {
   return sortNewest(await getCollection('projects', ({ data }) => !data.draft));
 }
 
-export async function getContentRecords(): Promise<ContentRecord[]> {
+export async function getEntries(): Promise<Entry[]> {
   const [writing, projects] = await Promise.all([getWriting(), getProjects()]);
-  return [
-    ...writing.map((entry): ContentRecord => ({
-      kind: entry.collection === 'articles' ? '文章' : '笔记',
+  return sortNewest<Entry>([...writing, ...projects]);
+}
+
+export async function getContentRecords(): Promise<ContentRecord[]> {
+  const entries = await getEntries();
+  return entries
+    .map((entry): ContentRecord => ({
       title: entry.data.title,
       description: entry.data.description,
       date: entry.data.date,
-      href: writingHref(entry),
+      href: entryHref(entry),
       tags: entry.data.tags,
-    })),
-    ...projects.map((entry): ContentRecord => ({
-      kind: '项目',
-      title: entry.data.title,
-      description: entry.data.description,
-      date: entry.data.date,
-      href: `/projects/${entry.id}/`,
-      tags: entry.data.tags,
-    })),
-  ].sort((a, b) => b.date.valueOf() - a.date.valueOf());
+      series: entry.data.series,
+    }))
+    .sort((a, b) => b.date.valueOf() - a.date.valueOf());
 }
 
 export async function getCourses(): Promise<CourseEntry[]> {
@@ -78,6 +76,10 @@ export async function getCourseNotes(courseId: string): Promise<NoteEntry[]> {
 }
 
 export function writingHref(entry: WritingEntry): string {
+  return entryHref(entry);
+}
+
+export function entryHref(entry: Entry): string {
   return `/writing/${entry.id}/`;
 }
 
@@ -98,7 +100,7 @@ export function formatMonth(date: Date): string {
   }).format(date);
 }
 
-export function getTagIndex(entries: WritingEntry[]) {
+export function getTagIndex(entries: Entry[]) {
   const tags = new Map<string, { label: string; count: number }>();
   for (const entry of entries) {
     for (const label of entry.data.tags) {
@@ -112,10 +114,14 @@ export function getTagIndex(entries: WritingEntry[]) {
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
 }
 
-export async function getRelatedWriting(entry: WritingEntry): Promise<WritingEntry[]> {
+export async function getRelatedEntries(entry: Entry): Promise<Entry[]> {
   if (entry.data.related.length === 0) return [];
-  const writing = await getWriting();
+  const writing = await getEntries();
   return entry.data.related
     .map((id) => writing.find((candidate) => candidate.id === id))
-    .filter((candidate): candidate is WritingEntry => Boolean(candidate));
+    .filter((candidate): candidate is Entry => Boolean(candidate));
+}
+
+export async function getSeriesEntries(seriesId: string): Promise<Entry[]> {
+  return (await getEntries()).filter((entry) => entry.data.series.includes(seriesId));
 }

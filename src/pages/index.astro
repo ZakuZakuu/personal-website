@@ -1,15 +1,15 @@
 ---
 import RecordList from '@/components/RecordList.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { getContentRecords, getProjects, getTagIndex, getWriting } from '@/lib/content';
+import { getContentRecords, getEntries, getProjects, getTagIndex } from '@/lib/content';
 
-const [records, projects, writing] = await Promise.all([
+const [records, projects, entries] = await Promise.all([
   getContentRecords(),
   getProjects(),
-  getWriting(),
+  getEntries(),
 ]);
 const currentProject = projects[0];
-const tags = getTagIndex(writing).slice(0, 10);
+const tags = getTagIndex(entries).slice(0, 10);
 ---
 
 <BaseLayout>
@@ -30,7 +30,7 @@ const tags = getTagIndex(writing).slice(0, 10);
             <p class="section-label">案头 · 正在形成</p>
             <h2 id="forming-title">{currentProject.data.title}</h2>
             <p>{currentProject.data.description}</p>
-            <a href={`/projects/${currentProject.id}/`}>查看记录 →</a>
+            <a href={`/writing/${currentProject.id}/`}>查看记录</a>
           </section>
         )
       }

@@ -6,6 +6,7 @@ export const site = {
   nav: [
     { href: '/', label: '首页' },
     { href: '/writing/', label: '全部' },
+    { href: '/series/', label: '合集' },
     { href: '/tags/', label: '标签' },
     { href: '/about/', label: '关于' },
   ],

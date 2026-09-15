@@ -4,6 +4,9 @@ const representativeRoutes = [
   '/',
   '/writing/',
   '/writing/cs336-overview/',
+  '/writing/learn-dsh-interactive-harness-course/',
+  '/series/',
+  '/series/cs336/',
   '/projects/learn-dsh-interactive-harness-course/',
   '/courses/',
   '/about/',
@@ -30,8 +33,8 @@ test('article typography renders clean headings and math', async ({ page, isMobi
   await page.goto('/writing/cs336-overview/');
 
   await expect(page.locator('.katex').first()).toBeVisible();
-  await expect(page.locator('.katex-display')).toHaveCount(1);
-  await expect(page.locator('.katex-display')).toHaveAttribute('tabindex', '0');
+  await expect(page.locator('.katex-display')).toHaveCount(2);
+  await expect(page.locator('.katex-display').first()).toHaveAttribute('tabindex', '0');
 
   const tableOfContentsLabels = await page
     .getByRole('navigation', { name: '本页目录' })
@@ -75,5 +78,5 @@ test('mobile navigation exposes every primary destination', async ({ page, isMob
   await page.getByText('菜单', { exact: true }).click();
   const navigation = page.getByRole('navigation', { name: '移动端导航' });
   await expect(navigation).toBeVisible();
-  await expect(navigation.getByRole('link')).toHaveCount(4);
+  await expect(navigation.getByRole('link')).toHaveCount(5);
 });

@@ -4,9 +4,13 @@
 
 Astro generates deployable HTML, CSS, and small progressive enhancements. There is no database, content API, account system, or server-side state. This keeps the canonical Markdown portable and makes Cloudflare Pages or any static host viable.
 
-## Collections represent editorial meaning
+## Public entries share one reading module
 
-Notes, articles, projects, courses, internal insights, and Now snapshots have separate typed collections because readers and authors use them differently. Shared query logic lives in `src/lib/content.ts`. Course membership and related writing are metadata relationships, not duplicated files.
+Every public piece is an Entry: it has one canonical `/writing/` URL and one reading layout. Notes, articles, and projects remain separate source collections only where their authoring metadata differs. A project may expose its state or links, but it does not receive a second visual template.
+
+## Series organize durable threads
+
+Series are explicit, metadata-driven collections of Entries that grow around one continuing question, project, or course. They complement tags: a tag is a cross-cutting index; a series preserves a thread over time. Neither duplicates the Markdown source.
 
 ## Search is derived after the build
 

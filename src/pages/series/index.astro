@@ -1,0 +1,66 @@
+---
+import PageHeader from '@/components/PageHeader.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { getSeriesEntries } from '@/lib/content';
+
+const series = (await getCollection('series', ({ data }) => !data.draft)).sort((a, b) =>
+  a.data.title.localeCompare(b.data.title),
+);
+const records = await Promise.all(
+  series.map(async (entry) => ({
+    entry,
+    count: (await getSeriesEntries(entry.id)).length,
+  })),
+);
+---
+
+<BaseLayout title="合集" description="沿着同一个问题持续生长的内容。">
+  <PageHeader title="合集" />
+  <section class="shell series-list" aria-label="内容合集">
+    {
+      records.map(({ entry, count }) => (
+        <article>
+          <a href={`/series/${entry.id}/`}>
+            <p>{count} 篇记录</p>
+            <h2>{entry.data.title}</h2>
+            <span>{entry.data.description}</span>
+          </a>
+        </article>
+      ))
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .series-list {
+    max-width: 58rem;
+    border-top: 1px solid var(--ink);
+  }
+  article {
+    border-bottom: 1px solid var(--line);
+  }
+  a {
+    display: block;
+    padding: 1.4rem 0 1.55rem;
+    text-decoration: none;
+  }
+  p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+  }
+  h2 {
+    margin: 0.45rem 0;
+    font-family: var(--font-serif);
+    font-size: clamp(1.35rem, 2.7vw, 1.85rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+  span {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+</style>

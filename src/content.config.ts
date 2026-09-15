@@ -8,6 +8,7 @@ const commonWriting = z.object({
   date: z.coerce.date(),
   updated: z.coerce.date().optional(),
   tags: z.array(z.string()).default([]),
+  series: z.array(z.string()).default([]),
   featured: z.boolean().default(false),
   draft: z.boolean().default(false),
   demo: z.boolean().default(false),
@@ -40,6 +41,7 @@ const projects = defineCollection({
     status: z.enum(['building', 'completed', 'paused', 'archived']),
     tech: z.array(z.string()).default([]),
     tags: z.array(z.string()).default([]),
+    series: z.array(z.string()).default([]),
     github: z.url().optional(),
     demoUrl: z.url().optional(),
     featured: z.boolean().default(false),
@@ -65,6 +67,16 @@ const courses = defineCollection({
   }),
 });
 
+const series = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/series' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    updated: z.coerce.date().optional(),
+    draft: z.boolean().default(false),
+  }),
+});
+
 const insights = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/insights' }),
   schema: z.object({
@@ -86,4 +98,4 @@ const now = defineCollection({
   }),
 });
 
-export const collections = { articles, notes, projects, courses, insights, now };
+export const collections = { articles, notes, projects, courses, series, insights, now };

@@ -16,11 +16,7 @@ Before writing, read:
 
 1. Gather the current conversation and any files or links the user supplied. Treat them as evidence, not merely as a topic prompt.
 2. Extract the concrete sequence: starting point, work attempted, observations, problems, explanations, decisions, result, and open questions. Mark claims that require verification and personal conclusions that only the user can supply.
-3. Choose the smallest fitting form:
-   - **Note** for one question, mechanism, observation, or compact learning record.
-   - **Article** for an argument or explanation assembled from multiple connected ideas.
-   - **Project log** for work performed, failures, decisions, results, and next steps.
-     Follow the substance rather than stretching material to fit a form.
+3. Choose the smallest useful source collection for metadata and authoring, but treat the public result as one **Entry** rather than a visible content type. Check whether the material continues an existing series; add its stable series ID only when it genuinely belongs to that thread.
 4. Draft around the extracted sequence. Preserve uncertainty, comparisons, failed attempts, and causal explanations when present. Keep technical identifiers exact.
 5. Run the voice pass from `voice-profile.md`. Remove claims, motivations, confidence, anecdotes, and conclusions not supported by the source. When essential material is missing, leave a concise marker or ask one focused question instead of inventing it.
 6. When writing into the site, create one Markdown or MDX file with the minimum useful metadata. Follow `site-authoring.md` for delivery: the default is a publication-ready pull request for the author's review; a local draft is only for an explicit request such as “只生成草稿” or “不要发 PR”. Preserve source links and colocate referenced assets when available.

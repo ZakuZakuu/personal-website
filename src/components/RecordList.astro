@@ -17,8 +17,8 @@ const { records, numbered = false } = Astro.props;
           {numbered && <span class="number">{String(index + 1).padStart(2, '0')}</span>}
           <div class="record-copy">
             <div class="meta">
-              <span>{record.kind}</span>
               <time datetime={record.date.toISOString()}>{formatDate(record.date)}</time>
+              {record.series.length > 0 && <span>{record.series.join(' / ')}</span>}
             </div>
             <h3>{record.title}</h3>
             <p>{record.description}</p>
@@ -64,9 +64,6 @@ const { records, numbered = false } = Astro.props;
   .meta {
     display: flex;
     gap: 0.8rem;
-  }
-  .meta span {
-    color: var(--accent);
   }
   h3 {
     margin: 0.4rem 0 0;

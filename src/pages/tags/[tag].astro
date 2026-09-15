@@ -2,16 +2,16 @@
 import ContentCard from '@/components/ContentCard.astro';
 import PageHeader from '@/components/PageHeader.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { getTagIndex, getWriting, type WritingEntry } from '@/lib/content';
+import { getEntries, getTagIndex, type Entry } from '@/lib/content';
 import { slugifyTag } from '@/lib/text';
 
 export async function getStaticPaths() {
-  const writing = await getWriting();
-  return getTagIndex(writing).map((tag) => ({
+  const entries = await getEntries();
+  return getTagIndex(entries).map((tag) => ({
     params: { tag: tag.slug },
     props: {
       label: tag.label,
-      entries: writing.filter((entry) =>
+      entries: entries.filter((entry) =>
         entry.data.tags.some((candidate) => slugifyTag(candidate) === tag.slug),
       ),
     },
@@ -20,7 +20,7 @@ export async function getStaticPaths() {
 
 interface Props {
   label: string;
-  entries: WritingEntry[];
+  entries: Entry[];
 }
 const { label, entries } = Astro.props;
 ---

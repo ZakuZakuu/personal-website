@@ -4,7 +4,8 @@ import { expect, test } from '@playwright/test';
 for (const route of [
   '/',
   '/writing/cs336-overview/',
-  '/projects/learn-dsh-interactive-harness-course/',
+  '/writing/learn-dsh-interactive-harness-course/',
+  '/series/cs336/',
   '/now/',
 ]) {
   test(`${route} has no automatically detectable accessibility violations`, async ({
