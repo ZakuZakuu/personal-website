@@ -1,0 +1,174 @@
+---
+import type { MarkdownHeading } from 'astro';
+import ContentCard from '@/components/ContentCard.astro';
+import TableOfContents from '@/components/TableOfContents.astro';
+import TagList from '@/components/TagList.astro';
+import { formatDate, getRelatedEntries, type Entry } from '@/lib/content';
+import { estimateReadingTime } from '@/lib/text';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  entry: Entry;
+  headings: MarkdownHeading[];
+  seriesTitle?: string;
+}
+
+const { entry, headings, seriesTitle } = Astro.props;
+const related = await getRelatedEntries(entry);
+const minutes = estimateReadingTime(entry.body ?? '');
+const project = entry.collection === 'projects' ? entry : undefined;
+const primarySeries = entry.data.series[0];
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description} article>
+  <article class="entry" data-pagefind-body>
+    <header class="entry-header reading-width">
+      <div class="entry-path">
+        <a href="/writing/">全部</a>
+        {
+          primarySeries && (
+            <>
+              <>
+                <span aria-hidden="true">/</span>
+                <a href={`/series/${primarySeries}/`}>{seriesTitle ?? primarySeries}</a>
+              </>
+            </>
+          )
+        }
+      </div>
+      <h1 data-pagefind-meta="title">{entry.data.title}</h1>
+      <p class="description">{entry.data.description}</p>
+      <div class="entry-facts">
+        <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
+        <span>{minutes} 分钟阅读</span>
+        {entry.data.updated && <span>更新于 {formatDate(entry.data.updated)}</span>}
+        {project && <span>{project.data.status}</span>}
+      </div>
+      <div class="entry-links">
+        <TagList tags={entry.data.tags} />
+        {
+          project && (project.data.github || project.data.demoUrl) && (
+            <nav aria-label="相关链接">
+              {project.data.github && <a href={project.data.github}>GitHub</a>}
+              {project.data.demoUrl && <a href={project.data.demoUrl}>演示</a>}
+            </nav>
+          )
+        }
+      </div>
+    </header>
+
+    <div class="entry-grid shell">
+      <aside class="toc-column"><TableOfContents {headings} /></aside>
+      <div class="prose"><slot /></div>
+    </div>
+
+    {
+      related.length > 0 && (
+        <section class="related reading-width" aria-labelledby="related-title">
+          <h2 id="related-title">继续阅读</h2>
+          <div>
+            {related.map((item) => (
+              <ContentCard entry={item} compact />
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </article>
+</BaseLayout>
+
+<style>
+  .entry {
+    padding-top: clamp(1.75rem, 4vw, 3.25rem);
+  }
+  .entry-header {
+    padding-bottom: 1.75rem;
+  }
+  .entry-path,
+  .entry-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.85rem;
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+  }
+  .entry-path {
+    margin-bottom: 1.35rem;
+  }
+  .entry-path a {
+    text-decoration: none;
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(2.05rem, 4.6vw, 3.35rem);
+    font-weight: 560;
+    letter-spacing: -0.045em;
+    line-height: 1.14;
+    line-break: strict;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+  .description {
+    max-width: 43rem;
+    margin: 1rem 0 0;
+    color: var(--ink-soft);
+    font-size: clamp(1rem, 1.6vw, 1.16rem);
+    line-height: 1.7;
+  }
+  .entry-facts {
+    margin-top: 1.35rem;
+  }
+  .entry-facts span:last-child {
+    color: var(--accent);
+  }
+  .entry-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem 1.25rem;
+    margin-top: 1rem;
+  }
+  .entry-links nav {
+    display: flex;
+    gap: 0.8rem;
+    font-size: 0.77rem;
+  }
+  .entry-links nav a {
+    color: var(--accent);
+    text-underline-offset: 0.25em;
+  }
+  .entry-grid {
+    display: grid;
+    grid-template-columns: minmax(9rem, 13rem) minmax(0, var(--content)) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .toc-column {
+    position: sticky;
+    top: calc(var(--header-height) + 1.5rem);
+    align-self: start;
+  }
+  .related {
+    margin-top: 5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+  .related h2 {
+    margin: 0 0 1rem;
+    font-family: var(--font-serif);
+    font-size: 1.45rem;
+    font-weight: 600;
+  }
+  @media (max-width: 63rem) {
+    .entry-grid {
+      grid-template-columns: minmax(0, var(--content));
+      justify-content: center;
+    }
+    .toc-column {
+      position: static;
+    }
+  }
+</style>

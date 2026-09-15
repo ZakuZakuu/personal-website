@@ -5,6 +5,7 @@ date: 2026-09-15
 status: building
 tech: [ESP32-S3, ESP-IDF, MuJoCo, Blender, Python]
 tags: [robotics, embodied-ai, simulation, motion-control]
+series: [rig-creature]
 featured: false
 draft: false
 ---

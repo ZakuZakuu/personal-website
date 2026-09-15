@@ -5,6 +5,7 @@ date: 2026-09-13
 status: building
 tech: [DSH, Cordis, React, TypeScript, Chromium]
 tags: [agents, harness-engineering, interactive-learning, DSH]
+series: [learn-dsh]
 draft: false
 ---
 

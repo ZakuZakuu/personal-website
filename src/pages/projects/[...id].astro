@@ -1,7 +1,7 @@
 ---
 import { render } from 'astro:content';
 import { getProjects, type ProjectEntry } from '@/lib/content';
-import ProjectLayout from '@/layouts/ProjectLayout.astro';
+import EntryLayout from '@/layouts/EntryLayout.astro';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -12,7 +12,7 @@ interface Props {
   project: ProjectEntry;
 }
 const { project } = Astro.props;
-const { Content } = await render(project);
+const { Content, headings } = await render(project);
 ---
 
-<ProjectLayout {project}><Content /></ProjectLayout>
+<EntryLayout entry={project} {headings}><Content /></EntryLayout>

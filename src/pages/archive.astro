@@ -2,10 +2,10 @@
 import ContentCard from '@/components/ContentCard.astro';
 import PageHeader from '@/components/PageHeader.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { getWriting } from '@/lib/content';
+import { getEntries } from '@/lib/content';
 
-const writing = await getWriting();
-const byYear = Map.groupBy(writing, (entry) => entry.data.date.getUTCFullYear());
+const entries = await getEntries();
+const byYear = Map.groupBy(entries, (entry) => entry.data.date.getUTCFullYear());
 ---
 
 <BaseLayout title="归档" description="按首次发布时间整理的文章与笔记。">

@@ -4,7 +4,7 @@ Markdown and MDX under `src/content/` are the canonical source. The schemas in `
 
 ## AI-assisted drafting
 
-Invoke `$personal-writing` when source material already exists in the current conversation or in supplied files. The skill extracts the author's questions, attempts, observations, decisions, and unresolved points before deciding whether the material fits a note, article, or project log.
+Invoke `$personal-writing` when source material already exists in the current conversation or in supplied files. The skill extracts the author's questions, attempts, observations, decisions, and unresolved points before choosing a source collection and checking whether the material belongs in a continuing series.
 
 AI-assisted entries default to a publication-ready pull request: the generated entry is public in source, but it reaches the production site only when you review and merge that PR. Say “只生成草稿” or “不要发 PR” when you instead want a local `draft: true` file. Review personal claims and missing context before merging; the skill may clarify and organize the author's reasoning, but it must not invent it.
 
@@ -26,7 +26,7 @@ skills/personal-writing/references/site-authoring.md，再开始写作。
 【把聊天记录、项目日志、笔记或链接放在这里】
 
 要求：
-- 根据材料判断它更适合做项目记录、笔记还是文章；
+- 根据材料选择最合适的源集合，并判断是否应接入已有合集；公开页面不展示固定内容类型；
 - 保留我原本的问题、尝试、取舍、困惑和结论，不要写成泛泛的教程；
 - 用自然的中文，避免 AI 腔、空泛开场和未经材料支持的个人感受；
 - 不确定或材料不足的地方不要编造，直接标出来；
@@ -50,7 +50,7 @@ Each command creates a conservative template and refuses to overwrite an existin
 
 ## Relationships
 
-- Put `course: course-id` and `order: 1` on a note to include it in a course. The note stays in `notes`; do not copy it into the course directory.
+- Put stable series IDs in `series`, for example `series: [cs336]`. Use a series only for a continuing thread; tags remain for cross-cutting topics.
 - Put writing entry IDs in `related` to create explicit related-reading links.
 - Set `draft: true` to exclude an entry from routes, feeds, search, tags, and indexes.
 - Use `featured: true` sparingly for homepage selections.

@@ -1,24 +1,22 @@
 ---
-import type { WritingEntry } from '@/lib/content';
-import { formatDate, writingHref } from '@/lib/content';
+import type { Entry } from '@/lib/content';
+import { entryHref, formatDate } from '@/lib/content';
 import TagList from './TagList.astro';
 
 interface Props {
-  entry: WritingEntry;
+  entry: Entry;
   compact?: boolean;
 }
 
 const { entry, compact = false } = Astro.props;
-const kind = entry.collection === 'articles' ? '文章' : '笔记';
 ---
 
 <article class:list={['content-card', { compact }]}>
   <div class="meta">
-    <span class="kind">{kind}</span>
     <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date)}</time>
     {entry.data.demo && <span class="demo">示例</span>}
   </div>
-  <h3><a href={writingHref(entry)}>{entry.data.title}</a></h3>
+  <h3><a href={entryHref(entry)}>{entry.data.title}</a></h3>
   {!compact && <p>{entry.data.description}</p>}
   {!compact && <TagList tags={entry.data.tags} />}
 </article>
@@ -42,10 +40,6 @@ const kind = entry.collection === 'articles' ? '文章' : '笔记';
     font-size: 0.67rem;
     letter-spacing: 0.025em;
     text-transform: uppercase;
-  }
-  .kind {
-    color: var(--accent);
-    font-weight: 700;
   }
   .demo {
     padding: 0.08rem 0.34rem;

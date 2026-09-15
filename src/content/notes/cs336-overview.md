@@ -4,6 +4,7 @@ description: 从课程 Overview 到 Tokenization，我开始重新理解 token�
 date: 2026-09-15
 updated: 2026-09-15
 tags: [LLM, CS336, training, systems, tokenization]
+series: [cs336]
 featured: false
 draft: false
 ---
