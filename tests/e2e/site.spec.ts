@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 const representativeRoutes = [
   '/',
   '/writing/',
+  '/writing/cs336-overview/',
   '/projects/learn-dsh-interactive-harness-course/',
   '/courses/',
   '/about/',
@@ -24,6 +25,29 @@ for (const route of representativeRoutes) {
     expect(sizes.document).toBeLessThanOrEqual(sizes.viewport + 1);
   });
 }
+
+test('article typography renders clean headings and math', async ({ page, isMobile }) => {
+  await page.goto('/writing/cs336-overview/');
+
+  await expect(page.locator('.katex').first()).toBeVisible();
+  await expect(page.locator('.katex-display')).toHaveCount(1);
+  await expect(page.locator('.katex-display')).toHaveAttribute('tabindex', '0');
+
+  const tableOfContentsLabels = await page
+    .getByRole('navigation', { name: '本页目录' })
+    .getByRole('link')
+    .allTextContents();
+  expect(tableOfContentsLabels.every((label) => !label.trim().endsWith('#'))).toBe(true);
+
+  if (!isMobile) {
+    const titleLineCount = await page.locator('h1').evaluate((heading) => {
+      const range = document.createRange();
+      range.selectNodeContents(heading);
+      return range.getClientRects().length;
+    });
+    expect(titleLineCount).toBeLessThanOrEqual(2);
+  }
+});
 
 test('theme choice persists after navigation', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });

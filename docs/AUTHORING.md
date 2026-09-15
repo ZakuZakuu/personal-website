@@ -60,6 +60,10 @@ Each command creates a conservative template and refuses to overwrite an existin
 
 Give content-specific assets descriptive names and keep them beside the content they support. Import images from MDX and render them with `MediaFigure.astro` so dimensions, lazy loading, alt text, and captions remain consistent. Use `VideoFigure.astro` for local or hosted video; always provide a useful title and poster when available.
 
+## Mathematics
+
+Use `$...$` for inline mathematics and `$$...$$` for display mathematics. The site processes these delimiters with `remark-math` and KaTeX; LaTeX-style `\(...\)` and `\[...\]` delimiters are not recognized in Markdown or MDX source.
+
 ## Before publishing
 
 ```bash

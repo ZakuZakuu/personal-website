@@ -11,7 +11,7 @@ const visible = headings.filter((heading) => heading.depth === 2 || heading.dept
 {
   visible.length >= 3 && (
     <nav class="toc" aria-labelledby="toc-title">
-      <p id="toc-title">On this page</p>
+      <p id="toc-title">本页目录</p>
       <ol>
         {visible.map((heading) => (
           <li class:list={{ nested: heading.depth === 3 }}>
@@ -46,7 +46,9 @@ const visible = headings.filter((heading) => heading.depth === 2 || heading.dept
   }
   li {
     font-size: 0.78rem;
+    line-break: strict;
     line-height: 1.45;
+    overflow-wrap: anywhere;
   }
   li.nested {
     padding-left: 0.75rem;

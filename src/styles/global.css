@@ -146,6 +146,8 @@ input {
 .prose h4 {
   scroll-margin-top: calc(var(--header-height) + 1.25rem);
   font-family: var(--font-serif);
+  line-break: strict;
+  overflow-wrap: anywhere;
   text-wrap: balance;
 }
 .prose h2 {
@@ -170,6 +172,7 @@ input {
   font-weight: 700;
 }
 .prose .heading-anchor {
+  display: inline-block;
   margin-left: 0.4em;
   color: var(--line-strong);
   font-family: var(--font-mono);
@@ -178,6 +181,9 @@ input {
   text-decoration: none;
   opacity: 0;
   transition: opacity 120ms ease;
+}
+.prose .heading-anchor::after {
+  content: '#';
 }
 .prose h2:hover .heading-anchor,
 .prose h3:hover .heading-anchor,
@@ -281,6 +287,11 @@ input {
   overflow-x: auto;
   overflow-y: hidden;
   padding-block: 0.3rem;
+  scrollbar-width: thin;
+}
+.prose .katex-display > .katex {
+  min-width: max-content;
+  text-align: center;
 }
 .prose .footnotes {
   margin-top: 3.5rem;
