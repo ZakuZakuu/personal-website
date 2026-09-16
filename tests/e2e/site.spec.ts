@@ -52,6 +52,43 @@ test('article typography renders clean headings and math', async ({ page, isMobi
   }
 });
 
+test('wrapped section headings keep a full-width divider', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'The divider is intentionally simplified at compact widths.');
+  await page.goto('/writing/cs336-overview/');
+
+  const heading = page.getByRole('heading', {
+    name: 'Data 不是训练前的准备工作，而是模型能力的一部分',
+  });
+  const divider = await heading.evaluate((element) => {
+    const styles = getComputedStyle(element);
+    const after = getComputedStyle(element, '::after');
+    return { borderTopWidth: styles.borderTopWidth, afterContent: after.content };
+  });
+
+  expect(divider.borderTopWidth).toBe('1px');
+  expect(divider.afterContent).toBe('none');
+});
+
+test('strong text remains distinct from body text', async ({ page }) => {
+  await page.goto('/writing/cs336-overview/');
+
+  const contrast = await page
+    .locator('.prose strong')
+    .first()
+    .evaluate((element) => {
+      const strong = getComputedStyle(element);
+      const body = getComputedStyle(element.parentElement!);
+      return {
+        color: strong.color,
+        parentColor: body.color,
+        weight: Number(strong.fontWeight),
+      };
+    });
+
+  expect(contrast.weight).toBeGreaterThanOrEqual(750);
+  expect(contrast.color).not.toBe(contrast.parentColor);
+});
+
 test('theme choice persists after navigation', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/');
