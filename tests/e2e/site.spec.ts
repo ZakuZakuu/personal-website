@@ -80,13 +80,26 @@ test('strong text remains distinct from body text', async ({ page }) => {
       const body = getComputedStyle(element.parentElement!);
       return {
         color: strong.color,
+        family: strong.fontFamily,
+        fontSize: strong.fontSize,
         parentColor: body.color,
+        parentFamily: body.fontFamily,
+        parentFontSize: body.fontSize,
+        parentWeight: Number(body.fontWeight),
         weight: Number(strong.fontWeight),
+        loaded: document.fonts.check(
+          '350 16px "Noto Serif SC Variable"',
+          element.textContent ?? '',
+        ),
       };
     });
 
-  expect(contrast.weight).toBeGreaterThanOrEqual(750);
-  expect(contrast.color).not.toBe(contrast.parentColor);
+  expect(contrast.family).toBe(contrast.parentFamily);
+  expect(contrast.family).toContain('Noto Serif SC Variable');
+  expect(contrast.loaded).toBe(true);
+  expect(contrast.fontSize).toBe(contrast.parentFontSize);
+  expect(contrast.color).toBe(contrast.parentColor);
+  expect(contrast.weight).toBeGreaterThan(contrast.parentWeight);
 });
 
 test('theme choice persists after navigation', async ({ page }) => {

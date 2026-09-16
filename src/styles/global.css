@@ -1,3 +1,4 @@
+@import '@fontsource-variable/noto-serif-sc';
 @import 'tailwindcss';
 @import 'katex/dist/katex.min.css';
 
@@ -5,8 +6,8 @@
   --font-sans:
     'Noto Sans CJK SC', 'Source Han Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
   --font-serif:
-    'Noto Serif CJK SC', 'Source Han Serif SC', 'Songti SC', SimSun, ui-serif, Georgia,
-    serif;
+    'Noto Serif SC Variable', 'Noto Serif CJK SC', 'Source Han Serif SC', 'Songti SC',
+    SimSun, ui-serif, Georgia, serif;
   --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 }
 
@@ -123,6 +124,7 @@ input {
   color: var(--ink);
   font-family: var(--font-serif);
   font-size: clamp(1.02rem, 1.4vw, 1.11rem);
+  font-weight: 350;
   line-height: 1.82;
 }
 
@@ -192,11 +194,11 @@ input {
   opacity: 1;
 }
 .prose strong {
-  color: color-mix(in srgb, var(--ink) 80%, var(--accent));
-  font-family: var(--font-sans);
-  font-size: 0.94em;
-  font-weight: 800;
-  letter-spacing: 0.01em;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  letter-spacing: inherit;
 }
 .prose a {
   color: var(--accent);
