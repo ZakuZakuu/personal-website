@@ -1,6 +1,10 @@
 # Voice profile
 
-This profile is a living approximation derived from the author's own development logs. Update it only from additional writing the author identifies as representative.
+This profile is a living, provisional approximation derived from the author's own development logs. It is a starting prior, not a complete Writing DNA. Update it only from additional writing the author identifies as representative, and keep uncertainty visible when samples disagree.
+
+## Calibration status
+
+The original development-log archive is not stored in this repository. A temporary review of nine representative logs in September 2026 sharpened the observations below, but this is still a provisional corpus: a stronger language and structure profile requires more samples across time and subject. See [style-audit.md](style-audit.md) for the confidence thresholds and review process.
 
 ## Stable tendencies
 
@@ -14,6 +18,18 @@ This profile is a living approximation derived from the author's own development
 - Prefer concrete comparisons—before/after, option A/B, enabled/disabled—and state the observed consequence.
 - Sources are practical working references, usually linked where they first become relevant.
 
+## Observed language and rhythm
+
+These are supported tendencies from the nine-log sample, not mandatory mannerisms:
+
+- Begin with the work already done: “今天继续……”“现在能实现……”“做了……然后……”。 A result or problem arrives before background explanation.
+- Use short paragraphs and occasional checklists when tracking bugs, unfinished work, or a sequence of settings. A list should represent a real set of tasks or cases, not manufacture an outline.
+- Move between Chinese and exact technical terms without translating every identifier. Explain the important mechanism in plain Chinese after naming the Unreal, Blender, TypeScript, or rendering concept.
+- Use casual qualifiers to keep claims honest: “感觉”“有点”“大概”“怀疑”“应该”“还不错”“勉强能接受”。 These are uncertainty markers, not filler to remove.
+- Let a concrete comparison carry the judgment: before/after screenshots, enabled/disabled settings, or one implementation against another. State what changed in practice.
+- Use “其实”“然后”“之后”“最后”“顺便” as natural joins, but vary the joins when a new draft starts sounding patterned.
+- End at the current state, a remaining bug, or a plausible next experiment. Do not add a lesson, slogan, or universal conclusion that the log did not contain.
+
 ## Editing calibration
 
 Aim for **lightly edited field notes**: clearer ordering and sentences, while retaining the author's immediacy and uncertainty.
@@ -23,6 +39,8 @@ Aim for **lightly edited field notes**: clearer ordering and sentences, while re
 - Translate unexplained jargon only when a reader needs it to follow the reasoning.
 - Avoid ornamental metaphors and grand claims. Personality should come from specific observations and honest reactions.
 - Avoid symmetrical introductions and conclusions. End on the actual result, takeaway, or unresolved next step.
+- Preserve informal reactions when they carry a real evaluation (“挺舒服”“有点怪”“爽死了”); soften or remove them only when the current article's subject and audience make them misleading.
+- Clean up accidental typos and broken wording, but do not turn the log into polished academic prose or erase its operational texture.
 
 ## Evidence pattern
 
