@@ -19,7 +19,8 @@ The writing profile lives with the skill at `skills/personal-writing/references/
 
 仓库：https://github.com/ZakuZakuu/personal-website
 请先读取 main 分支的 AGENTS.md、skills/personal-writing/SKILL.md、
-skills/personal-writing/references/voice-profile.md 和
+skills/personal-writing/references/voice-profile.md、
+skills/personal-writing/references/style-audit.md 和
 skills/personal-writing/references/site-authoring.md，再开始写作。
 
 材料：
@@ -29,6 +30,8 @@ skills/personal-writing/references/site-authoring.md，再开始写作。
 - 根据材料选择最合适的源集合，并判断是否应接入已有合集；公开页面不展示固定内容类型；
 - 保留我原本的问题、尝试、取舍、困惑和结论，不要写成泛泛的教程；
 - 用自然的中文，避免 AI 腔、空泛开场和未经材料支持的个人感受；
+- 写作前先判断语料校准的可信度；没有足够的本人原文时，只把风格判断当作暂时假设，不要声称已经完成稳定的文风复刻；
+- 写完后按 style-audit.md 做一次受控检查，只修改有材料依据的 AI 痕迹，不要机械删掉所有对比句、破折号或问句；
 - 不确定或材料不足的地方不要编造，直接标出来；
 - 按默认流程创建独立分支、完成校验并开一个指向 main 的审阅 PR；不要合并 PR。
 
