@@ -9,9 +9,6 @@ featured: false
 draft: false
 ---
 
-import MediaFigure from '../../components/MediaFigure.astro';
-import rooflineModel from './cs336-resource-accounting/roofline-model.webp';
-
 第二节开始进入 **resource accounting**。这一讲到目前为止几乎没有什么“新的模型结构”，反而一直在算：一个 tensor 占多少显存，一次矩阵乘法有多少 FLOPs，GPU 理论上能算多快，真实为什么又跑不到那个数字。
 
 刚开始看 motivating questions 的时候我就觉得特别眼熟：
@@ -334,11 +331,9 @@ $$
 
 到这里 Roofline Model 基本就是前面所有概念的汇总。
 
-<MediaFigure
-  src={rooflineModel}
-  alt="Roofline 模型示意图：横轴是算术强度，纵轴是实际 FLOP/s；低算术强度区域受显存带宽限制，高算术强度区域受峰值算力限制。"
-  caption="Roofline Model。CS336 Lecture 2 使用的图来自 JAX Scaling Book；这里保留了课程视频中的版本。"
-/>
+![Roofline 模型示意图：横轴是算术强度，纵轴是实际 FLOP/s；低算术强度区域受显存带宽限制，高算术强度区域受峰值算力限制。](https://jax-ml.github.io/scaling-book/assets/img/roofline-improved-1400.webp)
+
+*Roofline Model。CS336 Lecture 2 直接引用了这张 JAX Scaling Book 图。*
 
 它对应的核心关系是：
 
