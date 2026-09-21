@@ -333,7 +333,7 @@ $$
 
 ![Roofline 模型示意图：横轴是算术强度，纵轴是实际 FLOP/s；低算术强度区域受显存带宽限制，高算术强度区域受峰值算力限制。](https://jax-ml.github.io/scaling-book/assets/img/roofline-improved-1400.webp)
 
-*Roofline Model。CS336 Lecture 2 直接引用了这张 JAX Scaling Book 图。*
+_Roofline Model。CS336 Lecture 2 直接引用了这张 JAX Scaling Book 图。_
 
 它对应的核心关系是：
 
