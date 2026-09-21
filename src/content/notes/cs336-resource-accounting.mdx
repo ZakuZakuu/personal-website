@@ -161,15 +161,15 @@ $$
 2\times(\#tokens)\times(\#parameters)
 $$
 
-后面 backward 对每层还要分别算 input gradient 和 weight gradient，大约是 forward 的两倍。于是最后就会得到上一节已经见过的：
+这也就是上一节见过的
 
-$$
+$
 \boxed{\text{training FLOPs}\approx6ND}
-$$
+$
 
-这里 $N$ 是参数量，$D$ 是训练 token 数。
+的雏形：forward 已经能看到 $2\times(\#tokens)\times(\#parameters)$ 这个结构。至于 backward 为什么会再补出大约 $4ND$，老师会在后半段继续展开，我今天先不提前写。
 
-以前这个公式看起来比较像一个需要记住的经验式，现在终于看到它其实就是从一个个矩阵乘法的乘加操作数出来的。
+以前 $6ND$ 看起来比较像一个需要记住的经验式，现在至少已经能看到，它最终是从一个个矩阵乘法的乘加操作数出来的。
 
 课上还有同学问到 Strassen 之类 sub-cubic matrix multiplication。老师的回答也挺符合这门课的风格：理论上当然存在渐近复杂度更低的矩阵乘法算法，但真实大模型系统里的优化通常更关心 tiling、memory hierarchy、Tensor Core、kernel、并行和通信这些 system 问题。
 
