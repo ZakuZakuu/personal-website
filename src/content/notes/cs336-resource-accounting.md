@@ -1,8 +1,8 @@
 ---
-title: CS336 学习记录 02：从 FLOPs 到 Roofline
-description: 第二节前半段，从浮点数、einops、FLOPs、MFU，一路算到算术强度和 Roofline，开始把“GPU 为什么跑不满”这件事具体化。
+title: CS336 学习记录 02：Resource Accounting
+description: 第二节从浮点数、FLOPs 和 Roofline，一路算到反向传播、训练显存、梯度累积和 activation checkpointing，把大模型训练里的资源账真正算了一遍。
 date: 2026-09-21
-updated: 2026-09-21
+updated: 2026-09-22
 tags: [LLM, CS336, systems, GPU, performance]
 series: [cs336]
 featured: false
@@ -167,9 +167,9 @@ $
 \boxed{\text{training FLOPs}\approx6ND}
 $
 
-的雏形：forward 已经能看到 $2\times(\#tokens)\times(\#parameters)$ 这个结构。至于 backward 为什么会再补出大约 $4ND$，老师会在后半段继续展开，我今天先不提前写。
+的雏形：forward 已经能看到 $2\times(\#tokens)\times(\#parameters)$ 这个结构。后半段把 backward 也数完以后，这个 6 才真正落下来。
 
-以前 $6ND$ 看起来比较像一个需要记住的经验式，现在至少已经能看到，它最终是从一个个矩阵乘法的乘加操作数出来的。
+以前 $6ND$ 看起来比较像一个需要记住的经验式，现在终于能看到，它就是从一个个矩阵乘法的乘加操作数出来的。
 
 课上还有同学问到 Strassen 之类 sub-cubic matrix multiplication。老师的回答也挺符合这门课的风格：理论上当然存在渐近复杂度更低的矩阵乘法算法，但真实大模型系统里的优化通常更关心 tiling、memory hierarchy、Tensor Core、kernel、并行和通信这些 system 问题。
 
@@ -362,7 +362,232 @@ $$
 
 同一个算法，在带宽比较低的硬件上可能 memory-bound，换成更高带宽的硬件以后就可能碰到 compute ceiling。
 
-今天先学到 Roofline 这里。第二节后面还会继续进入 backward、optimizer、training loop、gradient accumulation 和 activation checkpointing。现在还没看，所以先不提前写；等明天把剩下的内容学完，再把这一篇继续补完整。
+## Backward 为什么大约是 forward 的两倍
+
+后半段重新回到一个两层线性网络：
+
+$
+H_2=H_1W_2
+$
+
+如果每个样本是一行，那么这一层 forward 的计算量大约是：
+
+$
+2BD^2
+$
+
+反向时需要做两件事。第一件是把梯度继续传给前一层：
+
+$
+\nabla_{H_1}L=\nabla_{H_2}L\,W_2^T
+$
+
+第二件是算当前权重自己的梯度：
+
+$
+\nabla_{W_2}L=H_1^T\nabla_{H_2}L
+$
+
+这两项本质上又各是一次同量级的 GEMM，所以 backward 大约是：
+
+$
+2BD^2+2BD^2=4BD^2
+$
+
+也就是 forward 的两倍。
+
+这里顺便把反向传播最核心的逻辑重新捡了一遍：weight gradient 是为了更新当前层参数；hidden gradient 本身不是要被优化，而是为了继续往前传播，让更前面的层能算出自己的 weight gradient。到了最原始输入，如果它本身不是可训练变量，一般也就没必要继续算 input gradient 了。
+
+这两个公式我准备直接留着当回忆：
+
+$
+\boxed{\nabla_X L=\nabla_Y L\,W^T}
+$
+
+$
+\boxed{\nabla_W L=X^T\nabla_Y L}
+$
+
+我这里还把符号搞混了一次。这个 toy MLP 里，$B$ 是 data points，$D$ 是 hidden dimension，所以一层的参数量大约是 $D^2$：
+
+$
+6BD^2
+$
+
+而 scaling law 常写的
+
+$
+6ND
+$
+
+里，$N$ 通常是参数量，$D$ 才是训练 token 数。也就是说这里更准确的对应是：
+
+    B              <-> D_scaling（token / data 数）
+    D_hidden^2     <-> N_scaling（参数量）
+
+所以以后最好直接在脑子里把 $6ND$ 翻译成：
+
+> 6 × parameters × tokens
+
+而不是只记字母。
+
+课件还特意强调，这个近似对 **short context Transformer** 也很好。原因是 Transformer 里大部分参数和计算也在 Q/K/V projection、attention output projection、MLP projection 这些线性层里；但 attention 还有 $O(S^2d)$ 的 $QK^T$ 和 $AV$。context 很长以后，这个二次项就不能继续忽略，$6ND$ 也会越来越不准。
+
+## 训练显存不只有 parameters
+
+接下来 optimizer 这一段，重点其实不是某个优化器本身，而是开始把训练时占显存的东西逐项数出来。
+
+老师先用一句很紧凑的路线把几个经典 optimizer 串起来：
+
+    SGD + gradient 的指数平均        -> Momentum
+    SGD + 累积 gradient^2            -> AdaGrad
+    AdaGrad + gradient^2 改成指数平均 -> RMSProp
+    RMSProp + gradient 的指数平均     -> Adam
+
+我一开始甚至把这四句看成了“四种开销”，后来才发现它只是在快速回顾 optimizer 的演化关系。
+
+对于一个 $L$ 层、每层 $D\times D$ 的 toy network，batch size 为 $B$，训练显存主要可以分成四类：
+
+| 内容 | 为什么要存 | 这个例子里的开销 |
+| --- | --- | --- |
+| Parameters | 模型权重本身 | BF16：$2D^2L$ bytes |
+| Activations | backward 时需要 forward 的中间结果 | BF16：$2BDL$ bytes |
+| Gradients | 每个参数对应一个梯度 | BF16：$2D^2L$ bytes |
+| Optimizer states | 保存历史梯度统计 | AdaGrad：$4D^2L$；Adam：$8D^2L$ bytes |
+
+Adam 对每个参数要保存一阶矩 $m$ 和二阶矩 $v$，通常都用 FP32，所以单 optimizer states 就是：
+
+$
+4+4=8\ \text{bytes/parameter}
+$
+
+在这套简化假设下，如果先不算 activation，Adam 训练一个参数至少就要：
+
+$
+2\ \text{(parameter)}
++2\ \text{(gradient)}
++8\ \text{(optimizer states)}
+=12\ \text{bytes}
+$
+
+这也把前面那道“8 张 80GB H100 能装多大模型”的 napkin math 接上了。
+
+这里还顺手发现视频画面里有一处变量名写法会让人以为又乘了一次 byte；官方源码里 gradient memory 是 \`2 * num_parameters\`，AdaGrad state 是 \`4 * num_parameters\`。这种 resource accounting 最稳的办法还是顺手检查一下单位：现在乘的是“参数个数”，还是已经算好的“bytes”。
+
+老师还强调了一个很有用的区分：**memory capacity 决定能不能 fit，memory bandwidth 和 compute 才直接决定跑得多快。**
+
+也就是说，单纯从 40GB 换成 80GB，如果模型和 batch 原本已经能完整放进 40GB，而且算力、带宽都一样，并不会因为容量翻倍就直接跑快一倍。但容量会间接限制 batch size、checkpointing、offload、并行方式，所以最后还是可能影响实际吞吐。
+
+## Gradient accumulation：一次塞不下，就分几次算
+
+大 batch 往往更稳定，也更容易形成大的 GEMM，但 activation memory 会随着 batch size 增长。如果想要 effective batch size = 1024，而显存一次只能塞 256 个样本，就可以拆成 4 个 micro-batch：
+
+    256 -> forward/backward -> 累积 gradient，不更新
+    256 -> forward/backward -> 继续累积
+    256 -> forward/backward -> 继续累积
+    256 -> forward/backward -> 继续累积
+                             -> optimizer.step()
+                             -> zero_grad()
+
+所以：
+
+$
+\text{effective batch size}
+=
+\text{micro batch size}
+\times
+\text{accumulation steps}
+$
+
+这里就是：
+
+$
+1024=256\times4
+$
+
+如果 loss 的 reduction 和 scaling 处理一致，那么把四个 micro-batch 的梯度求和再平均，和一次真正对 1024 个样本求平均梯度在理想条件下可以数学等价。
+
+它真正省掉的是**峰值 activation memory**：同一时刻只需要保留 256 个样本的 activation，而不是 1024 个。parameters、parameter gradients 和 optimizer states 并不会因此变小。
+
+所以 gradient accumulation 可以很直接地理解成：
+
+> 用更多次顺序计算，换更小的单次 batch 显存占用。
+
+总 FLOPs 并没有凭空减少，实际还可能因为更多 kernel launch 稍微慢一点。
+
+## Activation checkpointing：activation 不存也行，缺了再算
+
+另一个方法是 **Activation Checkpointing**，也常叫 gradient checkpointing 或 rematerialization。
+
+正常训练为了 backward，会把每一层的 activation 都存下来。checkpointing 则只保留一部分 checkpoint，backward 需要中间 activation 时，就从最近的 checkpoint 重新 forward 算一遍。
+
+所以它的哲学和 gradient accumulation 很像，都是：
+
+$
+\boxed{\text{more compute} \leftrightarrow \text{less memory}}
+$
+
+只是两者动的地方不同：gradient accumulation 减少的是一次同时处理的样本数；activation checkpointing 减少的是同一个 micro-batch 里长期保存的中间层 activation。
+
+### 为什么常说每隔 $\sqrt L$ 层存一次
+
+假设有 $L$ 层，每隔 $k$ 层保存一个 checkpoint。
+
+长期保存的 checkpoint 大约有：
+
+$
+\frac{L}{k}
+$
+
+个。
+
+而 backward 重算当前 segment 时，这一段最多还要临时保留大约 $k$ 个 activation。所以这类分段策略的峰值 activation memory 可以粗略写成：
+
+$
+M(k)\propto\frac{L}{k}+k
+$
+
+这里两项都是 memory：前者是全局 checkpoint，后者是当前重算 segment 的临时 activation，并不是把 memory 和 compute 加在一起。
+
+让两项平衡：
+
+$
+\frac{L}{k}=k
+$
+
+得到：
+
+$
+k=\sqrt L
+$
+
+于是峰值 activation memory 是：
+
+$
+O(\sqrt L)
+$
+
+同时每个 segment 只需要额外重算一次，总 recomputation 仍然是 $O(L)$。
+
+这里还有一个容易混的极端情况：
+
+- 全部 activation 都存：memory $O(L)$，几乎没有重算；
+- 什么都不存，并且为了每一层 backward 都从最开始重新算到那里：memory 可以做到 $O(1)$，但 compute 会变成 $O(L^2)$；
+- 每隔 $\sqrt L$ 层存一次，再按 segment 重算：memory $O(\sqrt L)$，额外 recomputation $O(L)$。
+
+所以“0 个 checkpoint”的 $O(1)$ memory 和上面的分段公式并不是完全同一种执行策略。只是不存 checkpoint、然后 backward 前完整重算一次并把整段 activation 暂存下来，峰值显存仍然会回到 $O(L)$；要做到真正的 $O(1)$，就得不断从头重算，代价才会涨到 $O(L^2)$。
+
+## 这一讲最后留下来的其实是一套 resource accounting 习惯
+
+第二节学完以后，感觉它真正想训练的不是背某个公式，而是看到一段训练代码以后，先主动问几件事：
+
+- tensor 有哪些：parameters、gradients、activations、optimizer states、data；
+- 这些 tensor 各自是什么 dtype，占多少 bytes；
+- 主要运算有多少 FLOPs，真实 FLOP/s 离硬件 peak 多远；
+- arithmetic intensity 多高，到底是 compute-bound 还是 memory-bound；
+- 如果模型或 batch fit 不下，是减小 micro-batch、做 checkpointing，还是换并行和 offload 策略。
+
+这样再看课程最后那几条 summary 就顺很多了：$6\times$ data points $\times$ parameters 是 compute 的粗账；Roofline 是判断速度瓶颈；gradient accumulation 和 activation checkpointing 则是在显存不够时重新安排“存”和“算”的关系。
 
 ## References
 
