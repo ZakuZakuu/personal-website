@@ -448,12 +448,12 @@ $
 
 对于一个 $L$ 层、每层 $D\times D$ 的 toy network，batch size 为 $B$，训练显存主要可以分成四类：
 
-| 内容 | 为什么要存 | 这个例子里的开销 |
-| --- | --- | --- |
-| Parameters | 模型权重本身 | BF16：$2D^2L$ bytes |
-| Activations | backward 时需要 forward 的中间结果 | BF16：$2BDL$ bytes |
-| Gradients | 每个参数对应一个梯度 | BF16：$2D^2L$ bytes |
-| Optimizer states | 保存历史梯度统计 | AdaGrad：$4D^2L$；Adam：$8D^2L$ bytes |
+| 内容             | 为什么要存                         | 这个例子里的开销                      |
+| ---------------- | ---------------------------------- | ------------------------------------- |
+| Parameters       | 模型权重本身                       | BF16：$2D^2L$ bytes                   |
+| Activations      | backward 时需要 forward 的中间结果 | BF16：$2BDL$ bytes                    |
+| Gradients        | 每个参数对应一个梯度               | BF16：$2D^2L$ bytes                   |
+| Optimizer states | 保存历史梯度统计                   | AdaGrad：$4D^2L$；Adam：$8D^2L$ bytes |
 
 Adam 对每个参数要保存一阶矩 $m$ 和二阶矩 $v$，通常都用 FP32，所以单 optimizer states 就是：
 
@@ -494,6 +494,7 @@ $
 $
 \text{effective batch size}
 =
+
 \text{micro batch size}
 \times
 \text{accumulation steps}
