@@ -491,20 +491,20 @@ $
 
 所以：
 
-$
+$$
 \text{effective batch size}
 =
 
 \text{micro batch size}
 \times
 \text{accumulation steps}
-$
+$$
 
 这里就是：
 
-$
+$$
 1024=256\times4
-$
+$$
 
 如果 loss 的 reduction 和 scaling 处理一致，那么把四个 micro-batch 的梯度求和再平均，和一次真正对 1024 个样本求平均梯度在理想条件下可以数学等价。
 
