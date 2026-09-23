@@ -4,6 +4,7 @@ const representativeRoutes = [
   '/',
   '/writing/',
   '/writing/cs336-overview/',
+  '/writing/cs336-resource-accounting/',
   '/writing/learn-dsh-interactive-harness-course/',
   '/series/',
   '/series/cs336/',
@@ -50,6 +51,20 @@ test('article typography renders clean headings and math', async ({ page, isMobi
     });
     expect(titleLineCount).toBeLessThanOrEqual(2);
   }
+});
+
+test('resource accounting renders gradient accumulation formulas', async ({ page }) => {
+  await page.goto('/writing/cs336-resource-accounting/');
+
+  const annotations = await page.locator('.katex-display annotation').allTextContents();
+  const normalizedAnnotations = annotations.map((annotation) =>
+    annotation.replace(/\s+/g, ' ').trim(),
+  );
+  expect(normalizedAnnotations).toContain(
+    '\\text{effective batch size} = \\text{micro batch size} \\times \\text{accumulation steps}',
+  );
+  expect(normalizedAnnotations).toContain('1024=256\\times4');
+  await expect(page.locator('h1').filter({ hasText: '$' })).toHaveCount(0);
 });
 
 test('wrapped section headings keep a full-width divider', async ({ page, isMobile }) => {
