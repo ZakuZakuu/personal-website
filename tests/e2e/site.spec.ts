@@ -67,6 +67,32 @@ test('resource accounting renders gradient accumulation formulas', async ({ page
   await expect(page.locator('h1').filter({ hasText: '$' })).toHaveCount(0);
 });
 
+test('resource accounting quick reference links and math resolve', async ({ page }) => {
+  await page.goto('/writing/cs336-resource-accounting/');
+
+  const hashes = await page
+    .locator('.prose a[href^="#"]:not(.heading-anchor)')
+    .evaluateAll((links) => links.map((link) => link.getAttribute('href') ?? ''));
+  expect(hashes.length).toBeGreaterThanOrEqual(12);
+  const missing = await page.evaluate(
+    (targets) =>
+      targets.filter((hash) => !document.getElementById(decodeURIComponent(hash.slice(1)))),
+    hashes,
+  );
+  expect(missing).toEqual([]);
+
+  const unrenderedMath = await page.locator('.prose p, .prose li, .prose td').evaluateAll(
+    (nodes) =>
+      nodes.filter((node) => {
+        const clone = node.cloneNode(true) as HTMLElement;
+        clone.querySelectorAll('.katex').forEach((katex) => katex.remove());
+        return clone.textContent?.includes('$');
+      }).length,
+  );
+  expect(unrenderedMath).toBe(0);
+  await expect(page.locator('.prose .katex-error')).toHaveCount(0);
+});
+
 test('wrapped section headings keep a full-width divider', async ({ page, isMobile }) => {
   test.skip(isMobile, 'The divider is intentionally simplified at compact widths.');
   await page.goto('/writing/cs336-overview/');
