@@ -104,7 +104,7 @@ test('section headings keep a full-width divider', async ({ page, isMobile }) =>
   test.skip(isMobile, 'The divider is intentionally simplified at compact widths.');
   await page.goto('/writing/cs336-overview/');
 
-  const heading = page.getByRole('heading', { name: '数据', exact: true });
+  const heading = page.getByRole('heading', { name: /^数据/ });
   const divider = await heading.evaluate((element) => {
     const styles = getComputedStyle(element);
     const after = getComputedStyle(element, '::after');
