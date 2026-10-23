@@ -12,6 +12,7 @@ Before writing, read:
 - [voice-profile.md](references/voice-profile.md) for the author's current writing tendencies.
 - [site-authoring.md](references/site-authoring.md) when creating or publishing a repository entry.
 - [style-audit.md](references/style-audit.md) for corpus calibration and the final AI-tell audit.
+- [study-notes.md](references/study-notes.md) when the entry is a learning note (course lecture, paper, technical topic) that the author will reread or use to look up formulas and numbers.
 
 ## Workflow
 
@@ -41,7 +42,7 @@ Write down the concrete sequence: starting point, work attempted, observations, 
 
 ### 4. Choose the smallest useful shape
 
-Choose the smallest useful source collection for metadata and authoring, but treat the public result as one **Entry** rather than a visible content type. Check whether the material continues an existing series; add its stable series ID only when it genuinely belongs to that thread. Use headings only when they help a reader find a real change in the reasoning.
+Choose the smallest useful source collection for metadata and authoring, but treat the public result as one **Entry** rather than a visible content type. Check whether the material continues an existing series; add its stable series ID only when it genuinely belongs to that thread. Use headings only when they help a reader find a real change in the reasoning. For a learning note, use the read-through-plus-lookup structure in `study-notes.md`: a quick reference first, short concept headings, conclusion-first sections, and `易混点` blocks for the author's confusions.
 
 ### 5. Draft from evidence, not from a template
 

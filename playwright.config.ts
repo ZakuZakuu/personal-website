@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: './tests/e2e',
   outputDir: 'test-results',
   fullyParallel: true,
-  reporter: 'line',
+  reporter: process.env.CI ? [['github'], ['line']] : 'line',
   use: {
     baseURL: 'http://127.0.0.1:4322',
     trace: 'retain-on-failure',

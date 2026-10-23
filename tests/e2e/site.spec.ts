@@ -34,7 +34,7 @@ test('article typography renders clean headings and math', async ({ page, isMobi
   await page.goto('/writing/cs336-overview/');
 
   await expect(page.locator('.katex').first()).toBeVisible();
-  await expect(page.locator('.katex-display')).toHaveCount(2);
+  await expect(page.locator('.katex-display')).toHaveCount(3);
   await expect(page.locator('.katex-display').first()).toHaveAttribute('tabindex', '0');
 
   const tableOfContentsLabels = await page
@@ -67,13 +67,44 @@ test('resource accounting renders gradient accumulation formulas', async ({ page
   await expect(page.locator('h1').filter({ hasText: '$' })).toHaveCount(0);
 });
 
-test('wrapped section headings keep a full-width divider', async ({ page, isMobile }) => {
+for (const [route, minimumLinks] of [
+  ['/writing/cs336-overview/', 6],
+  ['/writing/cs336-resource-accounting/', 12],
+] as const) {
+  test(`${route} quick reference links and math resolve`, async ({ page }) => {
+    await page.goto(route);
+
+    const hashes = await page
+      .locator('.prose a[href^="#"]:not(.heading-anchor)')
+      .evaluateAll((links) => links.map((link) => link.getAttribute('href') ?? ''));
+    expect(hashes.length).toBeGreaterThanOrEqual(minimumLinks);
+    const missing = await page.evaluate(
+      (targets) =>
+        targets.filter(
+          (hash) => !document.getElementById(decodeURIComponent(hash.slice(1))),
+        ),
+      hashes,
+    );
+    expect(missing).toEqual([]);
+
+    const unrenderedMath = await page.locator('.prose p, .prose li, .prose td').evaluateAll(
+      (nodes) =>
+        nodes.filter((node) => {
+          const clone = node.cloneNode(true) as HTMLElement;
+          clone.querySelectorAll('.katex').forEach((katex) => katex.remove());
+          return clone.textContent?.includes('$');
+        }).length,
+    );
+    expect(unrenderedMath).toBe(0);
+    await expect(page.locator('.prose .katex-error')).toHaveCount(0);
+  });
+}
+
+test('section headings keep a full-width divider', async ({ page, isMobile }) => {
   test.skip(isMobile, 'The divider is intentionally simplified at compact widths.');
   await page.goto('/writing/cs336-overview/');
 
-  const heading = page.getByRole('heading', {
-    name: 'Data 不是训练前的准备工作，而是模型能力的一部分',
-  });
+  const heading = page.getByRole('heading', { name: /^数据/ });
   const divider = await heading.evaluate((element) => {
     const styles = getComputedStyle(element);
     const after = getComputedStyle(element, '::after');
