@@ -24,22 +24,22 @@ draft: false
 
 ### 公式卡
 
-| 要算什么                                                                | 公式                                                                         | 备注                                                                           |
-| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| [tensor 占多少显存](#浮点格式一个数占几个-bytes)                        | 元素个数 × 每个元素的 bytes                                                  | FP32 4 bytes，BF16 / FP16 2 bytes，FP8 1 byte                                  |
-| [一次矩阵乘法](#flops矩阵乘法是-2--tokens--参数)                        | $(B\times D)\cdot(D\times K)$：$2BDK$ FLOPs                                  | 每个 $(i,j,k)$ 一次乘一次加                                                    |
-| [训练总计算量](#backward-是-forward-的两倍6nd-的来历)                   | $C\approx6ND$                                                                | $N$ = 参数量，$D$ = 训练 token 数。前向 $2ND$，反向 $4ND$；长 context 下会低估 |
-| [训练时间](#flopsmfu-与-gpu-计时)                                       | $T\approx\dfrac{6ND}{\#\text{GPUs}\times\text{peak FLOP/s}\times\text{MFU}}$ | MFU 能到 0.5 左右就算不错                                                      |
-| [训练显存（AdamW 混合精度）](#训练显存每个参数-12-bytes再加-activation) | $\approx12N$ bytes + activations                                             | 参数 2 + 梯度 2 + Adam 的 $m,v$ 各 4（FP32）                                   |
-| [最多能训多大的模型](#训练显存每个参数-12-bytes再加-activation)         | $N_{max}\approx\text{总显存}/12$                                             | 不含 activation，是上界。一张 80GB 卡大约 6.7B                                 |
-| [算术强度](#算术强度与-roofline卡在算还是卡在搬)                        | $AI=\text{FLOPs}/\text{Bytes moved}$                                         | bytes 要把读和写都算上                                                         |
-| [硬件强度](#硬件强度判断瓶颈的分界线)                                   | $\text{peak FLOP/s}/\text{memory bandwidth}$                                 | H100（BF16）约 295 FLOP/Byte                                                   |
-| [判断瓶颈](#硬件强度判断瓶颈的分界线)                                   | $AI<$ 硬件强度 → memory-bound；反之 compute-bound                            | elementwise 基本都是 memory-bound，大 matmul 是 compute-bound                  |
-| [Roofline 下的 MFU 上限](#roofline)                                     | $\min(1,\ AI/\text{硬件强度})$                                               | 只算单个操作、计算和搬运完全重叠的理想情况                                     |
-| [Gradient accumulation](#gradient-accumulation一次塞不下就分几次算)     | effective batch = micro batch × accumulation steps                           | 只降低峰值 activation 显存；参数、梯度、optimizer states 不变                  |
-| [Activation checkpointing](#为什么每隔-l-层存一次)                      | 每隔 $\sqrt L$ 层存一个 checkpoint                                           | activation 显存 $O(\sqrt L)$，额外重算 $O(L)$                                  |
+| 要算什么                                        | 公式                                                                         | 备注                                                                           |
+| ----------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| [tensor 占多少显存](#浮点格式)                  | 元素个数 × 每个元素的 bytes                                                  | FP32 4 bytes，BF16 / FP16 2 bytes，FP8 1 byte                                  |
+| [一次矩阵乘法](#flops-计数)                     | $(B\times D)\cdot(D\times K)$：$2BDK$ FLOPs                                  | 每个 $(i,j,k)$ 一次乘一次加                                                    |
+| [训练总计算量](#反向传播与-6nd)                 | $C\approx6ND$                                                                | $N$ = 参数量，$D$ = 训练 token 数。前向 $2ND$，反向 $4ND$；长 context 下会低估 |
+| [训练时间](#flops-与-mfu)                       | $T\approx\dfrac{6ND}{\#\text{GPUs}\times\text{peak FLOP/s}\times\text{MFU}}$ | MFU 能到 0.5 左右就算不错                                                      |
+| [训练显存（AdamW 混合精度）](#训练显存)         | $\approx12N$ bytes + activations                                             | 参数 2 + 梯度 2 + Adam 的 $m,v$ 各 4（FP32）                                   |
+| [最多能训多大的模型](#训练显存)                 | $N_{max}\approx\text{总显存}/12$                                             | 不含 activation，是上界。一张 80GB 卡大约 6.7B                                 |
+| [算术强度](#算术强度)                           | $AI=\text{FLOPs}/\text{Bytes moved}$                                         | bytes 要把读和写都算上                                                         |
+| [硬件强度](#硬件强度)                           | $\text{peak FLOP/s}/\text{memory bandwidth}$                                 | H100（BF16）约 295 FLOP/Byte                                                   |
+| [判断瓶颈](#硬件强度)                           | $AI<$ 硬件强度 → memory-bound；反之 compute-bound                            | elementwise 基本都是 memory-bound，大 matmul 是 compute-bound                  |
+| [Roofline 下的 MFU 上限](#roofline)             | $\min(1,\ AI/\text{硬件强度})$                                               | 只算单个操作、计算和搬运完全重叠的理想情况                                     |
+| [Gradient accumulation](#gradient-accumulation) | effective batch = micro batch × accumulation steps                           | 只降低峰值 activation 显存；参数、梯度、optimizer states 不变                  |
+| [Activation checkpointing](#每隔-l-层存一次)    | 每隔 $\sqrt L$ 层存一个 checkpoint                                           | activation 显存 $O(\sqrt L)$，额外重算 $O(L)$                                  |
 
-### 两道 napkin 例题
+### napkin 例题
 
 **70B 模型训练 15T tokens，1024 张 H100 要多久？** 课件的算法是先用 $6ND$ 算总量，再除以整个集群每天的有效算力（H100 BF16 dense 峰值 989.5 TFLOP/s，MFU 取 0.5）：
 
@@ -65,7 +65,7 @@ $$
 
 大约 53B。课件特意说明这里没算 activation（它取决于 batch size 和 sequence length），所以这是一个上界，真实能训的模型会更小。
 
-### 常用硬件数字
+### 硬件数字
 
 以下数字都来自课程源码：
 
@@ -79,7 +79,7 @@ $$
 | GPT-3 训练       | $3.14\times10^{23}$ FLOPs                                            |
 | GPT-4 训练       | 据推测约 $2\times10^{25}$ FLOPs                                      |
 
-## 浮点格式：一个数占几个 bytes
+## 浮点格式
 
 **一个 tensor 的显存 = 元素个数 × 每个元素的 bytes。** 后者由 dtype 决定：FP32 是 4 bytes，FP16 / BF16 是 2 bytes，FP8 是 1 byte。课件举的例子是 GPT-3 feedforward 层里的一个 $12288\times49152$ 矩阵，用 FP32 存就要约 2.3 GB。
 
@@ -112,7 +112,7 @@ optimizer states                    -> FP32
 
 再往下是 FP8。H100 支持两种 FP8：E4M3 的范围是 $[-448, 448]$，E5M2 是 $[-57344, 57344]$，一个用更多 bit 换精度，一个用更多 bit 换范围。
 
-### FP4：一小块数共享一个 scale
+### FP4 与共享 scale
 
 FP8 之后又讲到了 NVFP4。4 bit 一共就 16 种编码，E2M1 能表示的基础数值非常粗：
 
@@ -134,7 +134,7 @@ $$
 
 代价也很明显：同一个 block 里的数共享 scale，如果邻居之间量级差得太大，outlier 会把 scale 拉大，小数值就更容易被量化掉。这里让我第一次比较具体地感觉到，低精度不是简单地“少几个 bit”，而是需要额外的表示设计才能真的拿来训练。课件也提到 Nemotron 3 Super 已经是用 NVFP4 训练的。
 
-## einops：按维度名写 tensor 操作
+## einops
 
 **einops 不是新算法，而是让 tensor 操作从“第几个维度”变成“这个维度是什么”。**
 
@@ -163,7 +163,7 @@ rearrange(x, "... (heads hidden) -> ... heads hidden", heads=2)
 
 如果原来最后一维长度是 8，就会按 $8=2\times4$ 拆成 `heads=2, hidden=4`。Transformer 里经常要在 $(B,S,D)$ 和 $(B,S,H,D_h)$ 之间来回切，这种写法确实比一串 `view + transpose + permute` 更不容易看错。
 
-## FLOPs：矩阵乘法是 2 × tokens × 参数
+## FLOPs 计数
 
 **$(B\times D)$ 乘 $(D\times K)$ 的矩阵乘法大约是 $2BDK$ FLOPs；把 $B$ 看成 token 数、$DK$ 看成参数量，forward 就是 $2\times\text{tokens}\times\text{parameters}$。**
 
@@ -193,7 +193,7 @@ $$
 
 课上还有同学问到 Strassen 之类 sub-cubic matrix multiplication。老师的回答也挺符合这门课的风格：理论上当然存在渐近复杂度更低的矩阵乘法算法，但真实大模型系统里的优化通常更关心 tiling、memory hierarchy、Tensor Core、kernel、并行和通信这些 system 问题。也就是不一定把 $O(n^3)$ 改成 $O(n^{2.8})$，而是想办法让这个 $O(n^3)$ 真正在 GPU 上跑得接近硬件峰值。
 
-## FLOP/s、MFU 与 GPU 计时
+## FLOP/s 与 MFU
 
 **FLOPs 是做了多少运算，FLOP/s 是每秒能做多少；MFU 是实际 FLOP/s 占硬件峰值的比例，0.5 左右就算不错。**
 
@@ -225,7 +225,7 @@ $$
 
 课件定义里写着“ignore communication / overhead”，不是说通信和 overhead 不影响性能，而是它们不算进分子的有效 model FLOPs。通信、同步、kernel launch、数据搬运、等待其他 GPU 这些事情都会占时间，于是最后 MFU 会掉下来。
 
-### CUDA 计时前后要 synchronize
+### CUDA 计时
 
 GPU 默认很多操作是异步提交的。Python 执行：
 
@@ -241,7 +241,7 @@ torch.cuda.synchronize()
 
 否则测到的可能只是 CPU 把任务扔给 GPU 花了多久，而不是 GPU 真正完成 matmul 的时间。这个细节以前写训练代码基本不会主动想，但做性能分析时就完全不能忽略。
 
-## 算术强度与 Roofline：卡在算还是卡在搬
+## 算术强度
 
 **算术强度 = 每搬 1 Byte 数据做多少 FLOPs。它低于硬件的“算力 / 带宽比”就是 memory-bound，高于就是 compute-bound。** MFU 为什么到不了 1，很大一部分原因就在这里。
 
@@ -272,7 +272,7 @@ GELU 每个元素可以粗略按 20 FLOPs 算，算术强度是 $20/4=5$，比 R
 
 算术强度不是“计算占总时间的比例”，而是每搬 1 Byte 数据，能做多少次浮点运算。读和写的 bytes 都要算，漏掉写回会把 ReLU 的算术强度高估一倍。
 
-### 硬件强度：判断瓶颈的分界线
+### 硬件强度
 
 课件把硬件这一侧叫 accelerator intensity。我之后在国内交流里会更倾向叫它 **硬件算力/带宽比**，Roofline 里也常对应 **ridge point（屋脊点）**：
 
@@ -297,7 +297,7 @@ $$
 
 我自己的直觉就是：如果硬件每搬 1 Byte 理论上能做将近 300 FLOPs，但这个算法每搬 1 Byte 只安排了 0.25 FLOP，那显然算力是“吃不饱”的，瓶颈就在 memory bandwidth。
 
-### 为什么大 batch 能把 GPU 喂满
+### batch size 与利用率
 
 老师接着分别算了几种操作的 arithmetic intensity（BF16，$n=1024$ 左右）：
 
@@ -350,7 +350,7 @@ $$
 
 同一个算法，在带宽比较低的硬件上可能 memory-bound，换成更高带宽的硬件以后就可能碰到 compute ceiling。
 
-## Backward 是 forward 的两倍：6ND 的来历
+## 反向传播与 6ND
 
 **每个线性层的 backward 要做两次和 forward 同量级的 GEMM，所以 forward $2\times$、backward $4\times$，合起来是 $6\times\text{tokens}\times\text{parameters}$。**
 
@@ -411,7 +411,7 @@ D_hidden^2     <-> N_scaling（参数量）
 
 所以以后最好直接在脑子里把 $6ND$ 翻译成“6 × parameters × tokens”，而不是只记字母。
 
-## 训练显存：每个参数 12 bytes，再加 activation
+## 训练显存
 
 **AdamW 混合精度训练时，每个参数约 12 bytes：参数 2 + 梯度 2 + optimizer states 8。activation 另算，随 batch size 和 sequence length 增长。**
 
@@ -456,7 +456,7 @@ RMSProp + gradient 的指数平均     -> Adam
 
 另外视频画面里有一处变量名写法会让人以为又乘了一次 byte；官方源码里 gradient memory 是 `2 * num_parameters`，AdaGrad state 是 `4 * num_parameters`。这种 resource accounting 最稳的办法还是顺手检查一下单位：现在乘的是“参数个数”，还是已经算好的“bytes”。
 
-## 显存不够时：用计算换显存
+## 用计算换显存
 
 **两种方法都是多花计算、少占显存：gradient accumulation 减少一次同时处理的样本数，activation checkpointing 减少同一个 micro-batch 里长期保存的中间 activation。**
 
@@ -464,7 +464,7 @@ $$
 \boxed{\text{more compute} \leftrightarrow \text{less memory}}
 $$
 
-### Gradient accumulation：一次塞不下就分几次算
+### Gradient accumulation
 
 大 batch 往往更稳定，也更容易形成大的 GEMM，但 activation memory 会随着 batch size 增长。如果想要 effective batch size = 1024，而显存一次只能塞 256 个样本，就可以拆成 4 个 micro-batch：
 
@@ -497,13 +497,13 @@ $$
 
 它真正省掉的是**峰值 activation memory**：同一时刻只需要保留 256 个样本的 activation，而不是 1024 个。parameters、parameter gradients 和 optimizer states 并不会因此变小。总 FLOPs 也没有凭空减少，实际还可能因为更多 kernel launch 稍微慢一点。
 
-### Activation checkpointing：不存 activation，用到再算
+### Activation checkpointing
 
 **Activation Checkpointing** 也常叫 gradient checkpointing 或 rematerialization。正常训练为了 backward，会把每一层的 activation 都存下来；checkpointing 则只保留一部分 checkpoint，backward 需要中间 activation 时，就从最近的 checkpoint 重新 forward 算一遍。
 
 课件里最简单的版本是每一层都作为 checkpoint：只存每个 block 的输出 $h_i$，block 内部的中间结果（比如 ReLU 之前的那个值）在 backward 时重算。它已经能省下一部分显存，但 activation 还是随层数 $L$ 线性增长。
 
-### 为什么每隔 √L 层存一次
+### 每隔 √L 层存一次
 
 再进一步，假设有 $L$ 层，每隔 $k$ 层保存一个 checkpoint。长期保存的 checkpoint 大约有 $L/k$ 个；而 backward 重算当前 segment 时，这一段最多还要临时保留大约 $k$ 个 activation。所以峰值 activation memory 可以粗略写成：
 
@@ -525,7 +525,7 @@ $$
 
 “0 个 checkpoint”的 $O(1)$ memory 和上面的分段公式并不是同一种执行策略。如果只是不存 checkpoint、然后 backward 前完整重算一次并把整段 activation 暂存下来，峰值显存仍然会回到 $O(L)$；要做到真正的 $O(1)$，就得为每一层的 backward 都从最开始重新算到那里，代价才会涨到 $O(L^2)$。
 
-## 小结：看到训练代码先问的几件事
+## 小结
 
 第二节学完以后，感觉它真正想训练的不是背某个公式，而是看到一段训练代码以后，先主动问几件事：
 

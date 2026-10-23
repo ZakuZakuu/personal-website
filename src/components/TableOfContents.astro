@@ -6,6 +6,13 @@ interface Props {
 }
 const { headings } = Astro.props;
 const visible = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+
+let sectionNumber = 0;
+const items = visible.map((heading) => {
+  const nested = heading.depth === 3;
+  if (!nested) sectionNumber += 1;
+  return { ...heading, nested, number: nested ? undefined : sectionNumber };
+});
 ---
 
 {
@@ -13,9 +20,16 @@ const visible = headings.filter((heading) => heading.depth === 2 || heading.dept
     <nav class="toc" aria-labelledby="toc-title">
       <p id="toc-title">目录</p>
       <ol>
-        {visible.map((heading) => (
-          <li class:list={{ nested: heading.depth === 3 }}>
-            <a href={`#${heading.slug}`}>{heading.text}</a>
+        {items.map((heading) => (
+          <li class:list={{ nested: heading.nested, section: !heading.nested }}>
+            <a href={`#${heading.slug}`}>
+              {heading.number !== undefined && (
+                <span class="toc-number" aria-hidden="true">
+                  {String(heading.number).padStart(2, '0')}
+                </span>
+              )}
+              <span class="toc-label">{heading.text}</span>
+            </a>
           </li>
         ))}
       </ol>
@@ -25,6 +39,7 @@ const visible = headings.filter((heading) => heading.depth === 2 || heading.dept
 
 <style>
   .toc {
+    --toc-number-width: 1.65rem;
     padding: 1rem 0 1.1rem;
     border-block: 1px solid var(--line);
   }
@@ -37,26 +52,50 @@ const visible = headings.filter((heading) => heading.depth === 2 || heading.dept
     letter-spacing: 0.06em;
   }
   ol {
-    display: grid;
-    gap: 0.46rem;
     margin: 0;
     padding: 0;
     list-style: none;
   }
   li {
-    font-size: 0.78rem;
     line-break: strict;
     line-height: 1.45;
     overflow-wrap: anywhere;
   }
+  li.section {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  li.section:not(:first-child) {
+    margin-top: 0.7rem;
+  }
   li.nested {
-    padding-left: 0.75rem;
+    margin-left: calc(var(--toc-number-width) - 0.05rem);
+    padding: 0.2rem 0 0.2rem 0.7rem;
+    border-left: 1px solid var(--line);
+    font-size: 0.74rem;
+  }
+  li.section + li.nested {
+    margin-top: 0.35rem;
   }
   a {
+    display: grid;
+    grid-template-columns: auto;
     color: var(--ink-soft);
     text-decoration: none;
   }
-  a:hover {
+  li.section a {
+    grid-template-columns: var(--toc-number-width) minmax(0, 1fr);
+    align-items: baseline;
+    color: var(--ink);
+  }
+  .toc-number {
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+  }
+  a:hover,
+  a:hover .toc-number {
     color: var(--accent);
   }
 </style>
