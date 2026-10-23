@@ -114,9 +114,7 @@ $$
 
 也正因为这样，我开始理解教授为什么说 **predictability 至少和 optimality 一样重要**。把一次训练优化快 20% 很有价值，但如果小规模实验能提前告诉你某条路线放大以后根本不值得跑，省下来的可能是一次完整的大模型训练。
 
-#### 易混点
-
-这里我第一次把 **hyperparameter transfer** 和 scaling law 区分开：前者更像是在问“小模型上调好的超参数怎么迁移到大模型”（课件提到的是 muP 这类参数化方法），后者是在问“模型、数据和算力放大以后，性能会怎么变化”。它们共同做的事情其实很像——尽量把过去比较玄学的“炼丹”，变成一个可以在小规模验证、再有依据地放大的工程过程。课件的原话是，scaling law 不会自动出现，需要仔细构造 scaling recipe。
+**易混点**：这里我第一次把 **hyperparameter transfer** 和 scaling law 区分开：前者更像是在问“小模型上调好的超参数怎么迁移到大模型”（课件提到的是 muP 这类参数化方法），后者是在问“模型、数据和算力放大以后，性能会怎么变化”。它们共同做的事情其实很像——尽量把过去比较玄学的“炼丹”，变成一个可以在小规模验证、再有依据地放大的工程过程。课件的原话是，scaling law 不会自动出现，需要仔细构造 scaling recipe。
 
 ## 数据
 
@@ -147,9 +145,7 @@ Data 这一段讲得很短，但感觉其实完全可以单独开一门课。
 
 这里还第一次注意到 **mid-training** 这个说法。我的理解是，它仍然是在做 language modeling，但已经进入预训练后期，开始把数据分布往更高质量、长上下文或目标能力需要的数据上倾斜。它和“模型会更受最近训练数据影响”有一定关系，但显然不只是简单地最后塞一批好数据进去，还要考虑数据比例、学习率和遗忘问题。
 
-#### 易混点
-
-评估上也分得很清楚：internal evaluation 是为了指导模型开发，看重的是跨规模的平滑性和相对好坏，典型的是 validation loss / perplexity；external evaluation 衡量真实使用场景下的绝对质量，比如 GPQA、HLE、SWE-Bench、Terminal-Bench 这些 benchmark。前者告诉我“作为语言模型预测 token 做得怎么样”，后者才是在问“最终表现出来的能力怎么样”。两者并不能互相替代。课件还提到 perplexity 最好在不公开的文档上算，避免数据污染。
+**易混点**：评估上也分得很清楚：internal evaluation 是为了指导模型开发，看重的是跨规模的平滑性和相对好坏，典型的是 validation loss / perplexity；external evaluation 衡量真实使用场景下的绝对质量，比如 GPQA、HLE、SWE-Bench、Terminal-Bench 这些 benchmark。前者告诉我“作为语言模型预测 token 做得怎么样”，后者才是在问“最终表现出来的能力怎么样”。两者并不能互相替代。课件还提到 perplexity 最好在不公开的文档上算，避免数据污染。
 
 ## Alignment
 
@@ -173,9 +169,7 @@ Data 这一段讲得很短，但感觉其实完全可以单独开一门课。
 
 PPO、DPO、GRPO 都是在这个大框架里，用不同方式利用这些 reward / preference 信号。课件也列了这条路线的难点：RL 算法不稳定、难调；规模上去以后需要大量新基础设施（比如异步 rollout 的推理）；还要一直在系统效率和 on-policy 程度之间做取舍。
 
-#### 易混点
-
-这里课程用的是 full supervision 和 weak supervision 的对比，而不是简单的 supervised / unsupervised。SFT 是 full supervision 很典型的形式：直接示范“正确答案应该是什么”；RL 或 preference optimization 则可以只提供更弱、更间接的判断信号。
+**易混点**：这里课程用的是 full supervision 和 weak supervision 的对比，而不是简单的 supervised / unsupervised。SFT 是 full supervision 很典型的形式：直接示范“正确答案应该是什么”；RL 或 preference optimization 则可以只提供更弱、更间接的判断信号。
 
 ## Tokenization
 
@@ -185,9 +179,7 @@ PPO、DPO、GRPO 都是在这个大框架里，用不同方式利用这些 rewar
 
 教授先展示了几个很反直觉的现象：一个词前面的空格可能和词本身属于同一个 token，同一个 `hello` 出现在句首和句中可能会被表示成不同 token，数字也经常不是按“一个完整数字”来切，而是每几位拆成一块。
 
-#### 易混点
-
-以前我会下意识觉得 tokenizer 应该在做某种语言学意义上的切词，但实际上它更像是在根据训练语料，把常见的 byte sequence 压成更短的序列。
+**易混点**：以前我会下意识觉得 tokenizer 应该在做某种语言学意义上的切词，但实际上它更像是在根据训练语料，把常见的 byte sequence 压成更短的序列。
 
 ### 压缩率与词表大小
 

@@ -221,9 +221,7 @@ $$
 
 我现在更愿意把 MFU 理解成：这张 GPU 的理论计算能力，有多少最终转成了模型真正需要的数学计算。
 
-#### 易混点
-
-课件定义里写着“ignore communication / overhead”，不是说通信和 overhead 不影响性能，而是它们不算进分子的有效 model FLOPs。通信、同步、kernel launch、数据搬运、等待其他 GPU 这些事情都会占时间，于是最后 MFU 会掉下来。
+**易混点**：课件定义里写着“ignore communication / overhead”，不是说通信和 overhead 不影响性能，而是它们不算进分子的有效 model FLOPs。通信、同步、kernel launch、数据搬运、等待其他 GPU 这些事情都会占时间，于是最后 MFU 会掉下来。
 
 ### CUDA 计时
 
@@ -268,9 +266,7 @@ $$
 
 GELU 每个元素可以粗略按 20 FLOPs 算，算术强度是 $20/4=5$，比 ReLU 高不少，但依然很低。也就是说这些 elementwise operation 单独执行时，GPU 往往不是缺计算能力，而是在等数据。课件的说法是：单独执行时 ReLU 并不比 GELU 快，因为两者都卡在搬运上。
 
-#### 易混点
-
-算术强度不是“计算占总时间的比例”，而是每搬 1 Byte 数据，能做多少次浮点运算。读和写的 bytes 都要算，漏掉写回会把 ReLU 的算术强度高估一倍。
+**易混点**：算术强度不是“计算占总时间的比例”，而是每搬 1 Byte 数据，能做多少次浮点运算。读和写的 bytes 都要算，漏掉写回会把 ReLU 的算术强度高估一倍。
 
 ### 硬件强度
 
@@ -400,9 +396,7 @@ $$
 
 课件还特意强调，这个近似对 **short context Transformer** 也很好。原因是 Transformer 里大部分参数和计算也在 Q/K/V projection、attention output projection、MLP projection 这些线性层里；但 attention 还有 $O(S^2d)$ 的 $QK^T$ 和 $AV$。context 很长以后，这个二次项就不能继续忽略，$6ND$ 也会越来越不准。
 
-#### 易混点
-
-我这里把符号搞混了一次。这个 toy MLP 里，$B$ 是 data points，$D$ 是 hidden dimension，所以一层的参数量大约是 $D^2$，总计算量是 $6BD^2$。而 scaling law 常写的 $6ND$ 里，$N$ 通常是参数量，$D$ 才是训练 token 数。也就是说更准确的对应是：
+**易混点**：我这里把符号搞混了一次。这个 toy MLP 里，$B$ 是 data points，$D$ 是 hidden dimension，所以一层的参数量大约是 $D^2$，总计算量是 $6BD^2$。而 scaling law 常写的 $6ND$ 里，$N$ 通常是参数量，$D$ 才是训练 token 数。也就是说更准确的对应是：
 
 ```text
 B              <-> D_scaling（token / data 数）
@@ -441,9 +435,7 @@ $$
 
 至于真正的 Transformer，课件说账更复杂但思路一样，留给 Assignment 1 自己算。
 
-#### 易混点
-
-老师先用一句很紧凑的路线把几个经典 optimizer 串起来：
+**易混点**：老师先用一句很紧凑的路线把几个经典 optimizer 串起来：
 
 ```text
 SGD + gradient 的指数平均         -> Momentum
@@ -521,9 +513,7 @@ $$
 | 每隔 $\sqrt L$ 层存一个    | $O(\sqrt L)$    | $O(L)$   |
 | 什么都不存，每层都从头重算 | $O(1)$          | $O(L^2)$ |
 
-#### 易混点
-
-“0 个 checkpoint”的 $O(1)$ memory 和上面的分段公式并不是同一种执行策略。如果只是不存 checkpoint、然后 backward 前完整重算一次并把整段 activation 暂存下来，峰值显存仍然会回到 $O(L)$；要做到真正的 $O(1)$，就得为每一层的 backward 都从最开始重新算到那里，代价才会涨到 $O(L^2)$。
+**易混点**：“0 个 checkpoint”的 $O(1)$ memory 和上面的分段公式并不是同一种执行策略。如果只是不存 checkpoint、然后 backward 前完整重算一次并把整段 activation 暂存下来，峰值显存仍然会回到 $O(L)$；要做到真正的 $O(1)$，就得为每一层的 backward 都从最开始重新算到那里，代价才会涨到 $O(L^2)$。
 
 ## 小结
 

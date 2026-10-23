@@ -16,7 +16,7 @@ The reference model is `src/content/notes/cs336-resource-accounting.md`.
    Skip any subsection the material does not support. A note with nothing worth looking up does not need a quick reference.
 
 3. **Body sections in the source's order.** Each `##` section opens with a one- or two-sentence bold conclusion, then the derivation, examples, and the author's reasoning in their own words.
-4. **`#### 易混点` blocks.** Put the author's past confusions, misreadings, and easily-mixed distinctions in an `h4` block at the end of the relevant section, keeping the author's first-person wording. They stay in the note; they just no longer interrupt the main explanation. `h4` stays out of the table of contents.
+4. **`易混点` paragraphs.** Put the author's past confusions, misreadings, and easily-mixed distinctions at the end of the relevant section, starting with a bold lead-in: `**易混点**：…`. Keep the author's first-person wording. They stay in the note; they just no longer interrupt the main explanation. Do not make them headings: an `h4` directly under an `h2` fails the axe `heading-order` check, and an `h3` would clutter the table of contents.
 5. **Closing and References** as usual. Do not add a summary that repeats the quick reference.
 
 ## Headings
@@ -40,6 +40,8 @@ When an entry has quick-reference links, add or extend a browser test that asser
 - Check every number and formula in the quick reference against the primary source (lecture code, slides, or paper). Prefer the source's exact figures and say where they come from.
 - Numbers or examples the author did not write go in as course or source content (“课件里…”, “课程源码…”), never as the author's own discovery.
 - Display math uses `$$` on its own lines. A single `$` around a standalone formula renders as inline math.
+- Keep Chinese punctuation outside bold markers: `**易混点**：` works, `**易混点：**这里` does not render as bold, because a closing `**` right after punctuation and before a CJK character is not recognized.
+- Wide tables scroll horizontally on phones; the site makes them keyboard-focusable, so plain Markdown tables are fine.
 
 ## Relation to the editorial contract
 
