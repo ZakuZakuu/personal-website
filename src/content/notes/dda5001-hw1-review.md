@@ -264,7 +264,7 @@ toy trace 里，Pocket 的训练错误序列是 $[0.50,0.50,0.25,0.25,0.25,0.25,
 | 独立同分布            | independent and identically distributed (i.i.d.) | 样本独立且共享同一分布                      |
 | 稳健损失 / 间隔       | robust loss / margin                             | 降低离群残差影响 / 带符号的分类间隔         |
 | 有限差分 / 方向导数   | finite difference / directional derivative       | 用有限步长估计特定方向的变化率              |
-| 柯西–施瓦茨不等式     | Cauchy–Schwarz inequality                        | $                                           | a^\top b | \le\|a\|_2\|b\|_2$ |
+| 柯西–施瓦茨不等式     | Cauchy–Schwarz inequality                        | $\lvert a^\top b\rvert\le\|a\|_2\|b\|_2$    |
 | 口袋算法 / 检查点     | Pocket algorithm / checkpoint                    | 保存训练错误最低的历史参数                  |
 
 ## References
