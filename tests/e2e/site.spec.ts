@@ -1,27 +1,26 @@
-Warning: formatted20261024c was declared with const; use let for reassignable variables.
-import { expect, test } from "@playwright/test";
+import { expect, test } from '@playwright/test';
 
 const representativeRoutes = [
-  "/",
-  "/writing/",
-  "/writing/cs336-overview/",
-  "/writing/cs336-resource-accounting/",
-  "/writing/dda5001-hw1-review/",
-  "/writing/learn-dsh-interactive-harness-course/",
-  "/series/",
-  "/series/cs336/",
-  "/projects/learn-dsh-interactive-harness-course/",
-  "/courses/",
-  "/about/",
-  "/now/",
-  "/search/",
+  '/',
+  '/writing/',
+  '/writing/cs336-overview/',
+  '/writing/cs336-resource-accounting/',
+  '/writing/dda5001-hw1-review/',
+  '/writing/learn-dsh-interactive-harness-course/',
+  '/series/',
+  '/series/cs336/',
+  '/projects/learn-dsh-interactive-harness-course/',
+  '/courses/',
+  '/about/',
+  '/now/',
+  '/search/',
 ];
 
 for (const route of representativeRoutes) {
   test(`${route} renders without document overflow`, async ({ page }) => {
     const response = await page.goto(route);
     expect(response?.ok()).toBeTruthy();
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.locator('main')).toBeVisible();
     await expect(page).toHaveTitle(/Rabbit Hole/);
 
     const sizes = await page.evaluate(() => ({
@@ -32,29 +31,21 @@ for (const route of representativeRoutes) {
   });
 }
 
-test("article typography renders clean headings and math", async ({
-  page,
-  isMobile,
-}) => {
-  await page.goto("/writing/cs336-overview/");
+test('article typography renders clean headings and math', async ({ page, isMobile }) => {
+  await page.goto('/writing/cs336-overview/');
 
-  await expect(page.locator(".katex").first()).toBeVisible();
-  await expect(page.locator(".katex-display")).toHaveCount(3);
-  await expect(page.locator(".katex-display").first()).toHaveAttribute(
-    "tabindex",
-    "0",
-  );
+  await expect(page.locator('.katex').first()).toBeVisible();
+  await expect(page.locator('.katex-display')).toHaveCount(3);
+  await expect(page.locator('.katex-display').first()).toHaveAttribute('tabindex', '0');
 
   const tableOfContentsLabels = await page
-    .getByRole("navigation", { name: "本页目录" })
-    .getByRole("link")
+    .getByRole('navigation', { name: '本页目录' })
+    .getByRole('link')
     .allTextContents();
-  expect(
-    tableOfContentsLabels.every((label) => !label.trim().endsWith("#")),
-  ).toBe(true);
+  expect(tableOfContentsLabels.every((label) => !label.trim().endsWith('#'))).toBe(true);
 
   if (!isMobile) {
-    const titleLineCount = await page.locator("h1").evaluate((heading) => {
+    const titleLineCount = await page.locator('h1').evaluate((heading) => {
       const range = document.createRange();
       range.selectNodeContents(heading);
       return range.getClientRects().length;
@@ -63,37 +54,31 @@ test("article typography renders clean headings and math", async ({
   }
 });
 
-test("resource accounting renders gradient accumulation formulas", async ({
-  page,
-}) => {
-  await page.goto("/writing/cs336-resource-accounting/");
+test('resource accounting renders gradient accumulation formulas', async ({ page }) => {
+  await page.goto('/writing/cs336-resource-accounting/');
 
-  const annotations = await page
-    .locator(".katex-display annotation")
-    .allTextContents();
+  const annotations = await page.locator('.katex-display annotation').allTextContents();
   const normalizedAnnotations = annotations.map((annotation) =>
-    annotation.replace(/\s+/g, " ").trim(),
+    annotation.replace(/\s+/g, ' ').trim(),
   );
   expect(normalizedAnnotations).toContain(
-    "\\text{effective batch size} = \\text{micro batch size} \\times \\text{accumulation steps}",
+    '\\text{effective batch size} = \\text{micro batch size} \\times \\text{accumulation steps}',
   );
-  expect(normalizedAnnotations).toContain("1024=256\\times4");
-  await expect(page.locator("h1").filter({ hasText: "$" })).toHaveCount(0);
+  expect(normalizedAnnotations).toContain('1024=256\\times4');
+  await expect(page.locator('h1').filter({ hasText: '$' })).toHaveCount(0);
 });
 
 for (const [route, minimumLinks] of [
-  ["/writing/cs336-overview/", 6],
-  ["/writing/cs336-resource-accounting/", 12],
-  ["/writing/dda5001-hw1-review/", 8],
+  ['/writing/cs336-overview/', 6],
+  ['/writing/cs336-resource-accounting/', 12],
+  ['/writing/dda5001-hw1-review/', 8],
 ] as const) {
   test(`${route} quick reference links and math resolve`, async ({ page }) => {
     await page.goto(route);
 
     const hashes = await page
       .locator('.prose a[href^="#"]:not(.heading-anchor)')
-      .evaluateAll((links) =>
-        links.map((link) => link.getAttribute("href") ?? ""),
-      );
+      .evaluateAll((links) => links.map((link) => link.getAttribute('href') ?? ''));
     expect(hashes.length).toBeGreaterThanOrEqual(minimumLinks);
     const missing = await page.evaluate(
       (targets) =>
@@ -104,50 +89,39 @@ for (const [route, minimumLinks] of [
     );
     expect(missing).toEqual([]);
 
-    const unrenderedMath = await page
-      .locator(".prose p, .prose li, .prose td")
-      .evaluateAll(
-        (nodes) =>
-          nodes.filter((node) => {
-            const clone = node.cloneNode(true) as HTMLElement;
-            clone.querySelectorAll(".katex").forEach((katex) => katex.remove());
-            return clone.textContent?.includes("$");
-          }).length,
-      );
+    const unrenderedMath = await page.locator('.prose p, .prose li, .prose td').evaluateAll(
+      (nodes) =>
+        nodes.filter((node) => {
+          const clone = node.cloneNode(true) as HTMLElement;
+          clone.querySelectorAll('.katex').forEach((katex) => katex.remove());
+          return clone.textContent?.includes('$');
+        }).length,
+    );
     expect(unrenderedMath).toBe(0);
-    await expect(page.locator(".prose .katex-error")).toHaveCount(0);
+    await expect(page.locator('.prose .katex-error')).toHaveCount(0);
   });
 }
 
-test("section headings keep a full-width divider", async ({
-  page,
-  isMobile,
-}) => {
-  test.skip(
-    isMobile,
-    "The divider is intentionally simplified at compact widths.",
-  );
-  await page.goto("/writing/cs336-overview/");
+test('section headings keep a full-width divider', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'The divider is intentionally simplified at compact widths.');
+  await page.goto('/writing/cs336-overview/');
 
-  const heading = page.getByRole("heading", { name: /^数据/ });
+  const heading = page.getByRole('heading', { name: /^数据/ });
   const divider = await heading.evaluate((element) => {
     const styles = getComputedStyle(element);
-    const after = getComputedStyle(element, "::after");
-    return {
-      borderTopWidth: styles.borderTopWidth,
-      afterContent: after.content,
-    };
+    const after = getComputedStyle(element, '::after');
+    return { borderTopWidth: styles.borderTopWidth, afterContent: after.content };
   });
 
-  expect(divider.borderTopWidth).toBe("1px");
-  expect(divider.afterContent).toBe("none");
+  expect(divider.borderTopWidth).toBe('1px');
+  expect(divider.afterContent).toBe('none');
 });
 
-test("strong text remains distinct from body text", async ({ page }) => {
-  await page.goto("/writing/cs336-overview/");
+test('strong text remains distinct from body text', async ({ page }) => {
+  await page.goto('/writing/cs336-overview/');
 
   const contrast = await page
-    .locator(".prose strong")
+    .locator('.prose strong')
     .first()
     .evaluate((element) => {
       const strong = getComputedStyle(element);
@@ -163,52 +137,44 @@ test("strong text remains distinct from body text", async ({ page }) => {
         weight: Number(strong.fontWeight),
         loaded: document.fonts.check(
           '350 16px "Noto Serif SC Variable"',
-          element.textContent ?? "",
+          element.textContent ?? '',
         ),
       };
     });
 
   expect(contrast.family).toBe(contrast.parentFamily);
-  expect(contrast.family).toContain("Noto Serif SC Variable");
+  expect(contrast.family).toContain('Noto Serif SC Variable');
   expect(contrast.loaded).toBe(true);
   expect(contrast.fontSize).toBe(contrast.parentFontSize);
   expect(contrast.color).toBe(contrast.parentColor);
   expect(contrast.weight).toBeGreaterThan(contrast.parentWeight);
 });
 
-test("theme choice persists after navigation", async ({ page }) => {
-  await page.emulateMedia({ colorScheme: "light" });
-  await page.goto("/");
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await page.getByRole("button", { name: "切换到深色主题" }).click();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+test('theme choice persists after navigation', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await page.getByRole('button', { name: '切换到深色主题' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.reload();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 });
 
-test("the production search component is registered", async ({ page }) => {
-  await page.goto("/search/");
-  await expect(page.locator("pagefind-input")).toBeVisible();
+test('the production search component is registered', async ({ page }) => {
+  await page.goto('/search/');
+  await expect(page.locator('pagefind-input')).toBeVisible();
   await expect
-    .poll(() =>
-      page.evaluate(() => Boolean(customElements.get("pagefind-input"))),
-    )
+    .poll(() => page.evaluate(() => Boolean(customElements.get('pagefind-input'))))
     .toBe(true);
-  await page.locator("pagefind-input input").fill("Harness");
-  await expect(page.locator("pagefind-results a").first()).toBeVisible();
+  await page.locator('pagefind-input input').fill('Harness');
+  await expect(page.locator('pagefind-results a').first()).toBeVisible();
 });
 
-test("mobile navigation exposes every primary destination", async ({
-  page,
-  isMobile,
-}) => {
-  test.skip(
-    !isMobile,
-    "Mobile navigation is only rendered at the compact breakpoint.",
-  );
-  await page.goto("/");
-  await page.getByText("菜单", { exact: true }).click();
-  const navigation = page.getByRole("navigation", { name: "移动端导航" });
+test('mobile navigation exposes every primary destination', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Mobile navigation is only rendered at the compact breakpoint.');
+  await page.goto('/');
+  await page.getByText('菜单', { exact: true }).click();
+  const navigation = page.getByRole('navigation', { name: '移动端导航' });
   await expect(navigation).toBeVisible();
-  await expect(navigation.getByRole("link")).toHaveCount(5);
+  await expect(navigation.getByRole('link')).toHaveCount(5);
 });
