@@ -1,4 +1,3 @@
-Warning: fs was declared with const; use let for reassignable variables.
 ---
 title: DDA5001 HW1：从最小二乘到 Pocket
 description: 把 HW1 里的秩与零空间、最大似然、Huber、感知机收敛和 Pocket 串起来，重点记录做题时真正卡住的地方。
