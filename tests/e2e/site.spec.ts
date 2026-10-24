@@ -5,6 +5,7 @@ const representativeRoutes = [
   '/writing/',
   '/writing/cs336-overview/',
   '/writing/cs336-resource-accounting/',
+  '/writing/dda5001-hw1-review/',
   '/writing/learn-dsh-interactive-harness-course/',
   '/series/',
   '/series/cs336/',
@@ -70,6 +71,7 @@ test('resource accounting renders gradient accumulation formulas', async ({ page
 for (const [route, minimumLinks] of [
   ['/writing/cs336-overview/', 6],
   ['/writing/cs336-resource-accounting/', 12],
+  ['/writing/dda5001-hw1-review/', 8],
 ] as const) {
   test(`${route} quick reference links and math resolve`, async ({ page }) => {
     await page.goto(route);
