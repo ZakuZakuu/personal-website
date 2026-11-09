@@ -7,6 +7,7 @@ const representativeRoutes = [
   '/writing/cs336-resource-accounting/',
   '/writing/dda5001-hw1-review/',
   '/writing/csc5001-midterm-review/',
+  '/writing/dda5001-hw2-review/',
   '/writing/learn-dsh-interactive-harness-course/',
   '/series/',
   '/series/cs336/',
@@ -74,6 +75,7 @@ for (const [route, minimumLinks] of [
   ['/writing/cs336-resource-accounting/', 12],
   ['/writing/dda5001-hw1-review/', 8],
   ['/writing/csc5001-midterm-review/', 7],
+  ['/writing/dda5001-hw2-review/', 9],
 ] as const) {
   test(`${route} quick reference links and math resolve`, async ({ page }) => {
     await page.goto(route);
@@ -103,6 +105,18 @@ for (const [route, minimumLinks] of [
     await expect(page.locator('.prose .katex-error')).toHaveCount(0);
   });
 }
+
+test('HW2 review loads both heat maps', async ({ page }) => {
+  await page.goto('/writing/dda5001-hw2-review/');
+  const plots = page.locator('.prose figure img');
+  await expect(plots).toHaveCount(2);
+  for (const plot of await plots.all()) {
+    await plot.scrollIntoViewIfNeeded();
+    await expect
+      .poll(() => plot.evaluate((image) => (image as HTMLImageElement).naturalWidth))
+      .toBeGreaterThan(0);
+  }
+});
 
 test('section headings keep a full-width divider', async ({ page, isMobile }) => {
   test.skip(isMobile, 'The divider is intentionally simplified at compact widths.');
