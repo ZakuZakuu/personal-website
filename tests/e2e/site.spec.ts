@@ -6,6 +6,7 @@ const representativeRoutes = [
   '/writing/cs336-overview/',
   '/writing/cs336-resource-accounting/',
   '/writing/dda5001-hw1-review/',
+  '/writing/csc5001-midterm-review/',
   '/writing/dda5001-hw2-review/',
   '/writing/learn-dsh-interactive-harness-course/',
   '/series/',
@@ -73,6 +74,7 @@ for (const [route, minimumLinks] of [
   ['/writing/cs336-overview/', 6],
   ['/writing/cs336-resource-accounting/', 12],
   ['/writing/dda5001-hw1-review/', 8],
+  ['/writing/csc5001-midterm-review/', 7],
   ['/writing/dda5001-hw2-review/', 9],
 ] as const) {
   test(`${route} quick reference links and math resolve`, async ({ page }) => {
