@@ -19,11 +19,11 @@ const resolution = 30;
 const cells = Array.from({ length: resolution ** 2 }, (_, index) => {
   const x = (index % resolution) / resolution;
   const y = Math.floor(index / resolution) / resolution;
+  const loss = symmetryLoss([x + 0.5 / resolution, y + 0.5 / resolution]);
   return {
     x: plotX(x),
     y: plotY(y + 1 / resolution),
-    opacity:
-      0.03 + (0.68 * symmetryLoss([x + 0.5 / resolution, y + 0.5 / resolution])) / 2,
+    opacity: 0.03 + 0.34 * loss,
   };
 });
 const controls = [
@@ -59,12 +59,8 @@ const controls = [
       {
         ticks.map((tick) => (
           <g fill="currentColor" font-size="10">
-            <text x={plotX(tick)} y="275" text-anchor="middle">
-              {tick}
-            </text>
-            <text x="40" y={plotY(tick) + 3} text-anchor="end">
-              {tick}
-            </text>
+            <text x={plotX(tick)} y="275" text-anchor="middle">{tick}</text>
+            <text x="40" y={plotY(tick) + 3} text-anchor="end">{tick}</text>
           </g>
         ))
       }
@@ -73,7 +69,13 @@ const controls = [
       <circle cx={plotX(1)} cy={plotY(0)} r="7" class="minimum" />
       <circle cx={plotX(0)} cy={plotY(1)} r="7" class="minimum" />
       <path data-path d={descentPath(points)} class="trajectory" />
-      <circle data-start cx={plotX(initial[0])} cy={plotY(initial[1])} r="4" class="start" />
+      <circle
+        data-start
+        cx={plotX(initial[0])}
+        cy={plotY(initial[1])}
+        r="4"
+        class="start"
+      />
       <circle data-end cx={plotX(end[0])} cy={plotY(end[1])} r="5" class="end" />
     </svg>
     <div class="key" aria-hidden="true">

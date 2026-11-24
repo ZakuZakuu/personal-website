@@ -70,7 +70,7 @@ test('readers can change the gradient accumulation example', async ({ page }) =>
   await expect(example.locator('[data-step]:visible')).toHaveCount(8);
 });
 
-test('symmetry descent responds to equal and asymmetric initialization', async ({ page }) => {
+test('symmetry descent handles both initialization cases', async ({ page }) => {
   await page.goto('/writing/attention-head-specialization/');
   const example = page.getByRole('group', { name: '对称性破缺与梯度下降实验' });
   const result = example.getByRole('status');
