@@ -22,7 +22,8 @@ const cells = Array.from({ length: resolution ** 2 }, (_, index) => {
   return {
     x: plotX(x),
     y: plotY(y + 1 / resolution),
-    opacity: 0.03 + 0.68 * symmetryLoss([x + 0.5 / resolution, y + 0.5 / resolution]) / 2,
+    opacity:
+      0.03 + (0.68 * symmetryLoss([x + 0.5 / resolution, y + 0.5 / resolution])) / 2,
   };
 });
 const controls = [
@@ -39,7 +40,7 @@ const controls = [
     <svg
       viewBox="0 0 326 294"
       role="img"
-      aria-label="联合损失地形俯视图，横轴 x，纵轴 y。背景越深，损失越高；虚线为对称轴，轨迹展示联合梯度下降。"
+      aria-label="联合损失地形俯视图，横轴 x，纵轴 y。背景颜色越浓，损失越高；虚线为对称轴，轨迹展示联合梯度下降。"
     >
       {
         cells.map((cell) => (
@@ -58,8 +59,12 @@ const controls = [
       {
         ticks.map((tick) => (
           <g fill="currentColor" font-size="10">
-            <text x={plotX(tick)} y="275" text-anchor="middle">{tick}</text>
-            <text x="40" y={plotY(tick) + 3} text-anchor="end">{tick}</text>
+            <text x={plotX(tick)} y="275" text-anchor="middle">
+              {tick}
+            </text>
+            <text x="40" y={plotY(tick) + 3} text-anchor="end">
+              {tick}
+            </text>
           </g>
         ))
       }
@@ -76,14 +81,17 @@ const controls = [
       <span><i class="end-key"></i>当前点</span>
       <span><i class="minimum-key"></i>全局最优点</span>
     </div>
-    <div class="hint">背景越深，Loss 越高。虚线为 x = y。</div>
+    <div class="hint">背景颜色越浓，Loss 越高。虚线为 x = y。</div>
     <div class="controls">
       {
         controls.map((control) => (
           <label>
-            <span>{control.label}<b data-value={control.key}>{control.value}</b></span>
+            <span>
+              {control.label}<b data-value={control.key}>{control.value}</b>
+            </span>
             <input
               type="range"
+              aria-label={control.label}
               data-input={control.key}
               min={control.min}
               max={control.max}
@@ -123,8 +131,9 @@ const controls = [
       const start = this.querySelector('[data-start]');
       const end = this.querySelector('[data-end]');
       const output = this.querySelector('output');
-      if (!fieldset || !x || !y || !rate || !steps || !path || !start || !end || !output)
+      if (!fieldset || !x || !y || !rate || !steps || !path || !start || !end || !output) {
         return;
+      }
 
       const place = (element: Element, point: Point) => {
         element.setAttribute('cx', String(plotX(point[0])));

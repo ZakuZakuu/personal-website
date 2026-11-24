@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import test from 'node:test';
+
 import { descent, symmetryLoss } from './symmetry-descent.ts';
 
 test('the two asymmetric global minima have zero loss', () => {

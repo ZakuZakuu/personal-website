@@ -82,7 +82,7 @@ test('symmetry descent responds to equal and asymmetric initialization', async (
   await expect(result).toHaveText(/x = (\d\.\d{4})，y = \1，Loss =/);
   const equalPath = await example.locator('[data-path]').getAttribute('d');
   await example.getByRole('button', { name: '微小差异' }).click();
-  await expect(result).toHaveText(/x = 0\.99\d{2}，y = 0\.00\d{2}，Loss =/);
+  await expect(result).toHaveText('x = 1.0000，y = 0.0000，Loss = 0.000000');
   expect(await example.locator('[data-path]').getAttribute('d')).not.toBe(equalPath);
   await steps.focus();
   await steps.press('Home');
