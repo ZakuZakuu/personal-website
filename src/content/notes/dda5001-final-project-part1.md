@@ -82,6 +82,31 @@ torch.ones(size, size, dtype=torch.bool, device=device).tril(diagonal=0)
 
 Muon 的 `adjust_lr_fn='original'` 使用原始实现的矩阵形状相关学习率尺度调整规则；它与随训练步数变化的 warmup 和余弦衰减不是同一件事。实验中更改 Muon 的峰值学习率时，辅助 AdamW 的峰值学习率仍为 0.0003。本次 weight decay 设置为 0。
 
+### PyTorch 中参数、梯度与优化器状态
+
+起初我把优化器理解成“保存一堆梯度的容器”。更准确的区分是：模型参数保存当前权重，参数的 `.grad` 保存当前累积的梯度；优化器管理参数组和超参数，也可能保存动量、矩估计等历史状态。
+
+前向时，autograd 记录参与求导的操作及其依赖关系。调用 `loss.backward()` 后，它从 loss 出发，按链式法则反向计算，并把梯度贡献累积到需要梯度的叶子参数上。如果一个参数通过多条路径影响 loss，各条路径的贡献要相加。操作不必拆到加减乘除：矩阵乘法和 softmax 也可以有各自的反向规则。
+
+例如 $\\hat y=wx+b$、$L=(\\hat y-y)^2$，链式法则给出 $\\partial L/\\partial w=2(\\hat y-y)x$。实际 Transformer 的计算图更大、张量维度更多，但基本思路相同。`backward()` 算完梯度不会更新参数；`step()` 才按所选算法使用梯度更新参数。清除 `.grad` 也不会清除 AdamW 的矩估计或 SGDM 的动量。
+
+### 为什么累积梯度时要平均？
+
+当大 batch 放不进显存，可以拆成多个 micro-batch：先清除梯度，逐个前向和反向，把梯度累积起来，最后更新一次。如果每个 micro-batch 的有效 token 数相同，且其 loss 是 token 平均值，可以这样写：
+
+```python
+optimizer.zero_grad()
+for x_micro, y_micro in micro_batches:
+    logits = model(x_micro)
+    loss = loss_fn(logits, y_micro)  # 该 micro-batch 的平均 loss
+    (loss / len(micro_batches)).backward()
+optimizer.step()
+```
+
+因为求导是线性的，每个平均 loss 除以 micro-batch 数量后再反向，累积得到的是这些梯度的平均值。不除时得到的是梯度之和，尺度会不同。若各 micro-batch 的有效 token 数不同，应按有效 token 数加权，而不是简单给每个 micro-batch 相同权重。
+
+累积期间不应在每个 micro-batch 后 `step()`：那会更新多次参数，并使后续梯度在不同参数下计算。实际梯度累积与一次大 batch 在 dropout、依赖 batch 统计的层等情况下不一定完全一致。本实验的累积步数是 1；代码支持更大的累积步数。
+
 ## 六组实验：为什么训练越好，验证却变差？
 
 每种优化器分别使用默认峰值学习率和一个减半的值，其余课程规定设置保持一致。以下是最终 5,000 步的验证 loss 和墙钟时间；不是挑选验证 loss 最低的历史 checkpoint。
@@ -103,6 +128,12 @@ SGDM 也不是完全没有回升：默认学习率的最低记录验证 loss 为
 
 这些是单随机种子、特定数据和训练预算下的结果，不足以证明优化器的一般排名。这里比较的是最后预算处的 `last.pt`；`best.pt` 可能来自更早的验证最低点。两个概念各有用途，不能把历史最优误当作最终训练结果。
 
+### 横轴为什么用 token 和时间？
+
+按累计预测 token 数比较，是问在相同数据处理预算下各组表现如何；这里每次更新处理 18,432 个预测位置，因此每 500 步约为 9.216M tokens。随机窗口可能重叠，累计处理量不等于不同字符的数量。按训练时间比较则是问相同计算时间下表现如何，不同优化器每一步的耗时可能不同。
+
+本次图中的训练时间不包括验证和 checkpoint I/O，可能包含首次训练编译时间；它不同于报告表中的完整墙钟时间。随机窗口采样也没有清晰的逐遍历 epoch 边界，因此 token 数比 epoch 更直接地描述这次的训练预算。
+
 ## 绘图与回想
 
 每次评估将 token 数、训练时间和 loss 写入 `metrics.csv`。绘图代码取出横坐标 `xs` 和对应 loss `ys`，再调用 `ax.plot(xs, ys, ...)`。图上的圆点是实际记录值，连线只是连接记录点。AdamW 两个学习率的验证曲线在第 500 与 1,000 步的记录之间发生排序反转，但不能凭连线确定精确的交叉时刻。
@@ -115,4 +146,4 @@ SGDM 也不是完全没有回升：默认学习率的最低记录验证 loss 为
 4. 如果训练 loss 下降而验证 loss 上升，能直接断言是哪一个优化器机制造成的吗？
 5. 为什么同一个实验的 `best.pt` 和 `last.pt` 可能给出不同结论？
 
-相关回顾见 [HW1](/writing/dda5001-hw1-review/)、[HW2](/writing/dda5001-hw2-review/) 和 [HW3](/writing/dda5001-hw3-review/)。代码与任务说明见[课程项目仓库](https://github.com/CUHKSZ-Course/DDA5001-26Fall)；Muon 参数可参考 [PyTorch 文档](https://docs.pytorch.org/docs/stable/generated/torch.optim.Muon.html)。
+相关回顾见 [HW1](/writing/dda5001-hw1-review/)、[HW2](/writing/dda5001-hw2-review/) 和 [HW3](/writing/dda5001-hw3-review/)。关于计算图与梯度累积，可参阅 [PyTorch autograd 文档](https://docs.pytorch.org/docs/stable/notes/autograd.html)和[梯度清除教程](https://docs.pytorch.org/tutorials/recipes/recipes/zeroing_out_gradients.html)。代码与任务说明见[课程项目仓库](https://github.com/CUHKSZ-Course/DDA5001-26Fall)；Muon 参数可参考 [PyTorch 文档](https://docs.pytorch.org/docs/stable/generated/torch.optim.Muon.html)。
