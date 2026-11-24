@@ -33,6 +33,7 @@ skills/personal-writing/references/site-authoring.md，再开始写作。
 - 写作前先判断语料校准的可信度；没有足够的本人原文时，只把风格判断当作暂时假设，不要声称已经完成稳定的文风复刻；
 - 写完后按 style-audit.md 做一次受控检查，只修改有材料依据的 AI 痕迹，不要机械删掉所有对比句、破折号或问句；
 - 不确定或材料不足的地方不要编造，直接标出来；
+- 整理学习笔记或作业复盘时，初稿就把能帮助理解的原图放到相关正文旁边；有数据且图表能说明问题时，可用 AI 辅助整理数据并用 Matplotlib 等工具绘图，再核对图上的数值和单位；
 - 整理学习笔记或作业复盘时，优先将适合动手验证的公式、优化轨迹和算法行为转成 Generative UI，复用或新增轻量 Astro 组件，按本指南的 Interactive examples 验证；如果不适合交互，说明原因；
 - 按默认流程创建独立分支、完成校验并开一个指向 main 的审阅 PR；不要合并 PR。
 
@@ -62,7 +63,9 @@ Each command creates a conservative template and refuses to overwrite an existin
 
 ## Assets
 
-When the text interprets an existing experiment figure, screenshot, or diagram, include that visual beside the first substantive discussion. Check the supplied materials for the original figure, verify it matches the run or result discussed, and caption the axes or other details the reader needs to follow the comparison.
+Plan figures during the first draft of a learning note. Review the supplied material for experiment plots, screenshots, diagrams, and reusable course figures. Use a source figure when it supports the explanation, check it matches the example or run, and credit its source when appropriate. Place it beside the first passage that discusses it.
+
+When the data supports a useful comparison or trend and a suitable figure is missing, use Matplotlib or a similar plotting library to produce a static chart. AI can help inspect the data and write the plotting code. Check the plotted values, labels, and units against the source before embedding it. Write a caption that helps the reader connect the figure to the passage.
 
 Give content-specific assets descriptive names and keep them beside the content they support. Import images from MDX and render them with `MediaFigure.astro` so dimensions, lazy loading, alt text, and captions remain consistent. Use `VideoFigure.astro` for local or hosted video; always provide a useful title and poster when available.
 
