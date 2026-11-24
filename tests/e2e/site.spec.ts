@@ -4,6 +4,7 @@ const representativeRoutes = [
   '/',
   '/writing/',
   '/writing/cs336-overview/',
+  '/writing/attention-head-specialization/',
   '/writing/cs336-resource-accounting/',
   '/writing/dda5001-hw1-review/',
   '/writing/csc5001-midterm-review/',
@@ -67,6 +68,26 @@ test('readers can change the gradient accumulation example', async ({ page }) =>
   await example.getByLabel('梯度累积步数').selectOption('8');
   await expect(result).toHaveText('有效批大小为 1024（128 × 8）');
   await expect(example.locator('[data-step]:visible')).toHaveCount(8);
+});
+
+test('symmetry descent responds to equal and asymmetric initialization', async ({ page }) => {
+  await page.goto('/writing/attention-head-specialization/');
+  const example = page.getByRole('group', { name: '对称性破缺与梯度下降实验' });
+  const result = example.getByRole('status');
+  const steps = example.getByLabel('梯度下降步数');
+  await expect(result).toContainText('Loss =');
+  await example.getByRole('button', { name: '相同初始化' }).click();
+  await steps.focus();
+  await steps.press('End');
+  await expect(result).toHaveText(/x = (\d\.\d{4})，y = \1，Loss =/);
+  const equalPath = await example.locator('[data-path]').getAttribute('d');
+  await example.getByRole('button', { name: '微小差异' }).click();
+  await expect(result).toHaveText(/x = 0\.99\d{2}，y = 0\.00\d{2}，Loss =/);
+  expect(await example.locator('[data-path]').getAttribute('d')).not.toBe(equalPath);
+  await steps.focus();
+  await steps.press('Home');
+  await expect(result).toHaveText('x = 0.5100，y = 0.4900，Loss = 0.062450');
+  await expect(page.locator('.prose .katex-error')).toHaveCount(0);
 });
 
 test('resource accounting renders gradient accumulation formulas', async ({ page }) => {

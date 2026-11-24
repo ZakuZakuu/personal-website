@@ -33,7 +33,7 @@ skills/personal-writing/references/site-authoring.md，再开始写作。
 - 写作前先判断语料校准的可信度；没有足够的本人原文时，只把风格判断当作暂时假设，不要声称已经完成稳定的文风复刻；
 - 写完后按 style-audit.md 做一次受控检查，只修改有材料依据的 AI 痕迹，不要机械删掉所有对比句、破折号或问句；
 - 不确定或材料不足的地方不要编造，直接标出来；
-- 整理学习笔记或作业复盘时，主动找出适合动手验证的知识点，按本指南的 Interactive examples 处理；
+- 整理学习笔记或作业复盘时，优先将适合动手验证的公式、优化轨迹和算法行为转成 Generative UI，复用或新增轻量 Astro 组件，按本指南的 Interactive examples 验证；如果不适合交互，说明原因；
 - 按默认流程创建独立分支、完成校验并开一个指向 main 的审阅 PR；不要合并 PR。
 
 最后告诉我：文章路径、PR 链接、改动摘要，以及校验结果。
@@ -66,11 +66,11 @@ Give content-specific assets descriptive names and keep them beside the content 
 
 ## Interactive examples
 
-For learning notes and homework reviews, look for a question worth revisiting. A formula can become a parameterized example, an algorithm can show its intermediate states, and a common mistake can become a prediction the reader checks before revealing the explanation. Add an interaction where it makes that question easier to explore. Keep the original reasoning, formula, or worked example alongside it.
+Generative UI is the preferred default for learning notes when interaction adds understanding. During drafting, check for adjustable formulas, geometric intuition, optimization trajectories, algorithm steps, thresholds, and predictions. Preserve useful interactive examples from the source conversation. Reuse an existing Astro component when possible; otherwise implement a focused reusable component using static Astro markup and local browser computation. Keep the original reasoning, formula, or worked example alongside it. Do not force an interaction into notes that are better served by static prose; explain that decision in the PR.
 
 Use `.mdx` and prefer a reviewed Astro component. For example, import `BatchAccumulation` from `../../components/BatchAccumulation.astro` in a note at `src/content/notes/`, then insert `<BatchAccumulation microBatch={256} steps={4} />`. Use inputs and expected results grounded in the source. For a course exercise, apply the course's rules before including the prompt, solution, or test data in a public entry.
 
-Preview the rendered article. Check the initial example and at least one meaningful change, such as a boundary input or a wrong prediction with explanatory feedback. Check that readers can use the interaction on a narrow screen and with a keyboard.
+For a new component, keep calculation logic testable and the initial example usable without JavaScript. Add unit tests for the model and browser tests for representative interactions, including a meaningful boundary or counterexample. Preview the rendered article and check that readers can use the interaction on a narrow screen and with a keyboard. Avoid new dependencies, model calls, or server infrastructure for these examples. See [the Generative UI design note](research/generative-ui.md).
 
 ## Mathematics
 

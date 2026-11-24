@@ -1,0 +1,307 @@
+---
+import {
+  descent,
+  descentPath,
+  plotX,
+  plotY,
+  resultText,
+  symmetryLoss,
+  type Point,
+} from '../lib/symmetry-descent';
+
+const initial: Point = [0.55, 0.45];
+const rate = 0.08;
+const steps = 100;
+const points = descent(initial, rate, steps);
+const end = points[points.length - 1];
+const ticks = [0, 0.25, 0.5, 0.75, 1];
+const resolution = 30;
+const cells = Array.from({ length: resolution ** 2 }, (_, index) => {
+  const x = (index % resolution) / resolution;
+  const y = Math.floor(index / resolution) / resolution;
+  return {
+    x: plotX(x),
+    y: plotY(y + 1 / resolution),
+    opacity: 0.03 + 0.68 * symmetryLoss([x + 0.5 / resolution, y + 0.5 / resolution]) / 2,
+  };
+});
+const controls = [
+  { key: 'x', label: 'Head 1 初始参数 x', min: 0, max: 1, step: 0.01, value: initial[0] },
+  { key: 'y', label: 'Head 2 初始参数 y', min: 0, max: 1, step: 0.01, value: initial[1] },
+  { key: 'rate', label: '学习率', min: 0.01, max: 0.15, step: 0.01, value: rate },
+  { key: 'steps', label: '梯度下降步数', min: 0, max: 300, step: 1, value: steps },
+];
+---
+
+<symmetry-descent>
+  <fieldset disabled>
+    <legend>对称性破缺与梯度下降实验</legend>
+    <svg
+      viewBox="0 0 326 294"
+      role="img"
+      aria-label="联合损失地形俯视图，横轴 x，纵轴 y。背景越深，损失越高；虚线为对称轴，轨迹展示联合梯度下降。"
+    >
+      {
+        cells.map((cell) => (
+          <rect
+            x={cell.x}
+            y={cell.y}
+            width={240 / resolution}
+            height={240 / resolution}
+            fill="currentColor"
+            opacity={cell.opacity}
+          />
+        ))
+      }
+      <rect x="48" y="18" width="240" height="240" fill="none" stroke="currentColor" />
+      <path d="M48 258 L288 18" fill="none" stroke="currentColor" stroke-dasharray="4 4" />
+      {
+        ticks.map((tick) => (
+          <g fill="currentColor" font-size="10">
+            <text x={plotX(tick)} y="275" text-anchor="middle">{tick}</text>
+            <text x="40" y={plotY(tick) + 3} text-anchor="end">{tick}</text>
+          </g>
+        ))
+      }
+      <text x="302" y="275" fill="currentColor" font-size="12">x</text>
+      <text x="32" y="10" fill="currentColor" font-size="12">y</text>
+      <circle cx={plotX(1)} cy={plotY(0)} r="7" class="minimum" />
+      <circle cx={plotX(0)} cy={plotY(1)} r="7" class="minimum" />
+      <path data-path d={descentPath(points)} class="trajectory" />
+      <circle data-start cx={plotX(initial[0])} cy={plotY(initial[1])} r="4" class="start" />
+      <circle data-end cx={plotX(end[0])} cy={plotY(end[1])} r="5" class="end" />
+    </svg>
+    <div class="key" aria-hidden="true">
+      <span><i class="start-key"></i>初始点</span>
+      <span><i class="end-key"></i>当前点</span>
+      <span><i class="minimum-key"></i>全局最优点</span>
+    </div>
+    <div class="hint">背景越深，Loss 越高。虚线为 x = y。</div>
+    <div class="controls">
+      {
+        controls.map((control) => (
+          <label>
+            <span>{control.label}<b data-value={control.key}>{control.value}</b></span>
+            <input
+              type="range"
+              data-input={control.key}
+              min={control.min}
+              max={control.max}
+              step={control.step}
+              value={control.value}
+            />
+          </label>
+        ))
+      }
+    </div>
+    <output>{resultText(end)}</output>
+    <div class="actions">
+      <button type="button" data-preset="equal">相同初始化</button>
+      <button type="button" data-preset="different">微小差异</button>
+      <button type="button" data-preset="random">随机初始化</button>
+    </div>
+    <div class="hint">试试相同初始化，再点击微小差异，并增加梯度下降步数。</div>
+  </fieldset>
+</symmetry-descent>
+
+<script>
+  import {
+    descent,
+    descentPath,
+    plotX,
+    plotY,
+    resultText,
+    type Point,
+  } from '../lib/symmetry-descent';
+
+  class SymmetryDescent extends HTMLElement {
+    connectedCallback() {
+      const fieldset = this.querySelector('fieldset');
+      const inputs = Array.from(this.querySelectorAll<HTMLInputElement>('[data-input]'));
+      const [x, y, rate, steps] = inputs;
+      const path = this.querySelector('[data-path]');
+      const start = this.querySelector('[data-start]');
+      const end = this.querySelector('[data-end]');
+      const output = this.querySelector('output');
+      if (!fieldset || !x || !y || !rate || !steps || !path || !start || !end || !output)
+        return;
+
+      const place = (element: Element, point: Point) => {
+        element.setAttribute('cx', String(plotX(point[0])));
+        element.setAttribute('cy', String(plotY(point[1])));
+      };
+
+      const render = () => {
+        const initial: Point = [Number(x.value), Number(y.value)];
+        const points = descent(initial, Number(rate.value), Number(steps.value));
+        const current = points[points.length - 1];
+        path.setAttribute('d', descentPath(points));
+        place(start, initial);
+        place(end, current);
+        output.value = resultText(current);
+        for (const input of inputs) {
+          const label = this.querySelector('[data-value="' + input.dataset.input + '"]');
+          if (label) label.textContent = input.value;
+        }
+      };
+
+      fieldset.oninput = render;
+      for (const button of this.querySelectorAll<HTMLButtonElement>('[data-preset]')) {
+        button.onclick = () => {
+          if (button.dataset.preset === 'equal') {
+            x.value = '0.5';
+            y.value = '0.5';
+          } else if (button.dataset.preset === 'different') {
+            x.value = '0.51';
+            y.value = '0.49';
+          } else {
+            x.value = Math.random().toFixed(2);
+            y.value = Math.random().toFixed(2);
+          }
+          render();
+        };
+      }
+      fieldset.disabled = false;
+      render();
+    }
+  }
+
+  customElements.define('symmetry-descent', SymmetryDescent);
+</script>
+
+<style>
+  symmetry-descent {
+    display: block;
+    margin-block: 2rem;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  fieldset {
+    min-inline-size: 0;
+    padding: 0.85rem 1rem 1rem;
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+  }
+
+  legend {
+    padding-inline: 0.4rem;
+    font-weight: 650;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    max-width: 32rem;
+    margin-inline: auto;
+    color: var(--ink);
+  }
+
+  .trajectory {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .start {
+    fill: var(--accent);
+    stroke: var(--paper);
+    stroke-width: 1.5;
+  }
+
+  .end {
+    fill: var(--ink);
+    stroke: var(--paper);
+    stroke-width: 1.5;
+  }
+
+  .minimum {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    stroke-dasharray: 2 2;
+  }
+
+  .key,
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+  }
+
+  .key {
+    justify-content: center;
+    font-size: 0.8rem;
+  }
+
+  .key span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .key i {
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 50%;
+  }
+
+  .start-key {
+    background: var(--accent);
+  }
+
+  .end-key {
+    background: var(--ink);
+  }
+
+  .minimum-key {
+    border: 1px dashed var(--ink);
+  }
+
+  .hint {
+    margin-block: 0.5rem;
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: 0.5rem 1rem;
+  }
+
+  label span {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  input[type='range'] {
+    display: block;
+    width: 100%;
+    min-height: 2.75rem;
+    accent-color: var(--accent);
+  }
+
+  output {
+    display: block;
+    margin-block: 0.75rem;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+
+  button {
+    min-height: 2.75rem;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--ink-soft);
+    border-radius: 0.2rem;
+    color: var(--ink);
+    background: var(--paper);
+    font: inherit;
+    cursor: pointer;
+  }
+</style>

@@ -46,7 +46,7 @@ Choose the smallest useful source collection for metadata and authoring, but tre
 
 ### 5. Draft from evidence, not from a template
 
-For learning notes and homework reviews, look for a concept the reader could understand better by changing an input or checking a prediction. When drafting a site entry, follow [Interactive examples](../../docs/AUTHORING.md#interactive-examples) for selection and verification.
+**Generative UI is the preferred default for suitable learning notes, not an optional afterthought.** Before drafting a technical or study note, identify questions involving adjustable parameters, mathematical behavior, geometric intuition, optimization trajectories, algorithm steps, or predictions. Check existing Astro components first. If a meaningful interaction appeared in the source conversation, preserve its learning purpose in the site entry unless there is a concrete reason not to. If no existing component fits, create a small, reusable Astro component with local browser computation and embed it in MDX. Keep the static explanation and worked example. Do not add decorative or forced interactions. Follow [Interactive examples](../../docs/AUTHORING.md#interactive-examples) for implementation and verification; report which interaction was added or why a static note was preferable.
 
 Lead with the concrete question, event, result, or contradiction. Preserve uncertainty, comparisons, failed attempts, and causal explanations when present. Keep technical identifiers exact. Let the material decide whether the piece needs a short note, a longer explanation, a timeline, or a case study; do not add a symmetrical introduction, a three-part structure, or a grand conclusion just because they are available.
 
@@ -60,7 +60,7 @@ When writing into the site, create one Markdown or MDX file with the minimum use
 
 ### 8. Validate and report
 
-Validate every modified entry using the repository's configured checks. Report the output path, editorial choices that materially changed the source, unresolved markers, confidence gaps in the voice calibration, and the pull-request URL or local-draft state.
+Validate every modified entry using the repository's configured checks. Report the output path, interactive component and verification (or the reason for omitting it), editorial choices that materially changed the source, unresolved markers, confidence gaps in the voice calibration, and the pull-request URL or local-draft state.
 
 ## Editorial contract
 
