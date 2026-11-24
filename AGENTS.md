@@ -482,15 +482,9 @@ pnpm check
 pnpm build
 ```
 
-Also run:
+Run unit tests and browser tests when configured, especially for interactive components. Type/content checks, tests, and production builds are required quality gates.
 
-```text
-tests
-lint
-format checks
-```
-
-when configured.
+Formatting is advisory. Use `pnpm format` or format only changed files when tooling is available; report remaining Prettier warnings without blocking otherwise correct content. Do not spend additional review rounds solely on formatting.
 
 Do not report a task as complete if the build is failing unless the failure is explicitly documented.
 
