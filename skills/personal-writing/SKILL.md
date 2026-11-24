@@ -46,6 +46,8 @@ Choose the smallest useful source collection for metadata and authoring, but tre
 
 ### 5. Draft from evidence, not from a template
 
+For learning notes and homework reviews, look for a concept the reader could understand better by changing an input or checking a prediction. When drafting a site entry, follow [Interactive examples](../../docs/AUTHORING.md#interactive-examples) for selection and verification.
+
 Lead with the concrete question, event, result, or contradiction. Preserve uncertainty, comparisons, failed attempts, and causal explanations when present. Keep technical identifiers exact. Let the material decide whether the piece needs a short note, a longer explanation, a timeline, or a case study; do not add a symmetrical introduction, a three-part structure, or a grand conclusion just because they are available.
 
 ### 6. Run the voice and AI-tell passes

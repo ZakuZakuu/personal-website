@@ -2,7 +2,7 @@
 
 Use this reference when the entry is a learning note the author will come back to: course lectures, papers, or technical topics with formulas, numbers, or definitions worth looking up later. The note has to work two ways: read top to bottom as a review of the material, and scanned in a few seconds to find one formula.
 
-The reference model is `src/content/notes/cs336-resource-accounting.md`.
+The reference model is `src/content/notes/cs336-resource-accounting.mdx`.
 
 ## Structure
 

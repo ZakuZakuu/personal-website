@@ -9,6 +9,8 @@ featured: false
 draft: false
 ---
 
+import BatchAccumulation from '../../components/BatchAccumulation.astro';
+
 第二节开始进入 **resource accounting**。这一讲几乎没有什么“新的模型结构”，反而一直在算：一个 tensor 占多少显存，一次矩阵乘法有多少 FLOPs，GPU 理论上能算多快，真实为什么又跑不到那个数字。
 
 刚开始看 motivating questions 的时候我就觉得特别眼熟：
@@ -484,6 +486,8 @@ $$
 $$
 1024=256\times4
 $$
+
+<BatchAccumulation microBatch={256} steps={4} />
 
 如果 loss 的 reduction 和 scaling 处理一致，那么把四个 micro-batch 的梯度求和再平均，和一次真正对 1024 个样本求平均梯度在理想条件下可以数学等价。
 

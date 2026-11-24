@@ -143,4 +143,3 @@ C 在第 14 轮的验证交叉熵是 $0.1862$。到第 30 轮，训练交叉熵�
 4. 训练损失下降但验证损失上升时，为什么最后一个 epoch 不一定是合适的 checkpoint？
 
 相关课程回顾见 [HW1](/writing/dda5001-hw1-review/) 和 [HW2](/writing/dda5001-hw2-review/)。L2 正则化与权重衰减也可以参考 [《动手学深度学习》Weight Decay](https://d2l.ai/chapter_multilayer-perceptrons/weight-decay.html)。
-

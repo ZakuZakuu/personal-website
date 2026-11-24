@@ -56,6 +56,19 @@ test('article typography renders clean headings and math', async ({ page, isMobi
   }
 });
 
+test('readers can change the gradient accumulation example', async ({ page }) => {
+  await page.goto('/writing/cs336-resource-accounting/');
+
+  const example = page.getByRole('group', { name: '试算有效批大小' });
+  const result = example.getByRole('status');
+  await expect(result).toHaveText('有效批大小为 1024（256 × 4）');
+  await example.getByLabel('每个微批的样本数').selectOption('128');
+  await expect(result).toHaveText('有效批大小为 512（128 × 4）');
+  await example.getByLabel('梯度累积步数').selectOption('8');
+  await expect(result).toHaveText('有效批大小为 1024（128 × 8）');
+  await expect(example.locator('[data-step]:visible')).toHaveCount(8);
+});
+
 test('resource accounting renders gradient accumulation formulas', async ({ page }) => {
   await page.goto('/writing/cs336-resource-accounting/');
 

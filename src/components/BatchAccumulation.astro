@@ -1,0 +1,133 @@
+---
+interface Props {
+  microBatch?: number;
+  steps?: number;
+}
+
+const sizes = [32, 64, 128, 256, 512, 1024];
+const stepCounts = [1, 2, 4, 8, 16];
+const { microBatch = 256, steps = 4 } = Astro.props;
+
+if (!sizes.includes(microBatch) || !stepCounts.includes(steps)) {
+  throw new Error('BatchAccumulation defaults must match the available options.');
+}
+---
+
+<batch-accumulation>
+  <fieldset disabled>
+    <legend>试算有效批大小</legend>
+    <div class="inputs">
+      <label>
+        每个微批的样本数
+        <select data-size>
+          {sizes.map((size) => <option selected={size === microBatch}>{size}</option>)}
+        </select>
+      </label>
+      <label>
+        梯度累积步数
+        <select data-steps>
+          {stepCounts.map((count) => <option selected={count === steps}>{count}</option>)}
+        </select>
+      </label>
+    </div>
+    <output>有效批大小为 {microBatch * steps}（{microBatch} × {steps}）</output>
+    <div class="sequence" aria-hidden="true">
+      {
+        Array.from({ length: Math.max(...stepCounts) }, (_, index) => (
+          <span data-step hidden={index >= steps} />
+        ))
+      }
+    </div>
+    <div class="sequence-label">每格一次前后向计算，累积完再更新一次参数。</div>
+  </fieldset>
+</batch-accumulation>
+
+<script>
+  class BatchAccumulation extends HTMLElement {
+    connectedCallback() {
+      const fieldset = this.querySelector('fieldset');
+      const sizeInput = this.querySelector<HTMLSelectElement>('[data-size]');
+      const stepsInput = this.querySelector<HTMLSelectElement>('[data-steps]');
+      const result = this.querySelector('output');
+      const blocks = this.querySelectorAll<HTMLElement>('[data-step]');
+      if (!fieldset || !sizeInput || !stepsInput || !result) return;
+
+      fieldset.onchange = () => {
+        const size = Number(sizeInput.value);
+        const steps = Number(stepsInput.value);
+        result.value = `有效批大小为 ${size * steps}（${size} × ${steps}）`;
+        blocks.forEach((block, index) => {
+          block.hidden = index >= steps;
+        });
+      };
+      fieldset.disabled = false;
+    }
+  }
+
+  customElements.define('batch-accumulation', BatchAccumulation);
+</script>
+
+<style>
+  batch-accumulation {
+    display: block;
+    margin-block: 2rem;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  fieldset {
+    min-inline-size: 0;
+    padding: 0.85rem 1rem 1rem;
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+  }
+
+  legend {
+    padding-inline: 0.4rem;
+    font-weight: 650;
+  }
+
+  .inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+    gap: 0.65rem 1rem;
+  }
+
+  select {
+    display: block;
+    width: 100%;
+    min-height: 2.75rem;
+    margin-top: 0.25rem;
+    padding-inline: 0.5rem;
+    border: 1px solid var(--ink-soft);
+    border-radius: 0.2rem;
+    color: var(--ink);
+    background: var(--paper);
+    font: inherit;
+  }
+
+  output {
+    display: block;
+    margin-block: 0.85rem 0.5rem;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sequence {
+    display: flex;
+    gap: 0.2rem;
+  }
+
+  .sequence span {
+    flex: 1;
+    height: 0.45rem;
+    background: var(--accent);
+  }
+
+  .sequence-label {
+    margin-top: 0.3rem;
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+  }
+</style>
