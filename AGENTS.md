@@ -231,6 +231,10 @@ over generic textbook explanations.
 
 # AI Writing Workflow
 
+Before creating or revising site content, read [docs/AUTHORING.md](docs/AUTHORING.md), including its interactive examples and validation guidance. For learning notes, assess whether an interactive example would improve understanding, preserve useful interactions from the source material, and reuse existing components where appropriate. If no interaction is suitable, explain why in the PR. Follow the guide for implementation and verification.
+
+The repository also provides [skills/personal-writing/SKILL.md](skills/personal-writing/SKILL.md) for explicitly invoked personal-writing workflows.
+
 The intended content workflow is conversational.
 
 Ryan may ask AI to turn previous discussions into:
