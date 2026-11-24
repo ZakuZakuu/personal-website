@@ -54,29 +54,29 @@ const controls = [
           />
         ))
       }
-      <rect x="48" y="18" width="240" height="240" fill="none" stroke="currentColor" />
-      <path d="M48 258 L288 18" fill="none" stroke="currentColor" stroke-dasharray="4 4" />
+      <rect x="48" y="18" width="240" height="240" fill="none" stroke="currentColor"></rect>
+      <path d="M48 258 L288 18" fill="none" stroke="currentColor" stroke-dasharray="4 4"
+      ></path>
       {
         ticks.map((tick) => (
           <g fill="currentColor" font-size="10">
-            <text x={plotX(tick)} y="275" text-anchor="middle">{tick}</text>
-            <text x="40" y={plotY(tick) + 3} text-anchor="end">{tick}</text>
+            <text x={plotX(tick)} y="275" text-anchor="middle">
+              {tick}
+            </text>
+            <text x="40" y={plotY(tick) + 3} text-anchor="end">
+              {tick}
+            </text>
           </g>
         ))
       }
       <text x="302" y="275" fill="currentColor" font-size="12">x</text>
       <text x="32" y="10" fill="currentColor" font-size="12">y</text>
-      <circle cx={plotX(1)} cy={plotY(0)} r="7" class="minimum" />
-      <circle cx={plotX(0)} cy={plotY(1)} r="7" class="minimum" />
-      <path data-path d={descentPath(points)} class="trajectory" />
-      <circle
-        data-start
-        cx={plotX(initial[0])}
-        cy={plotY(initial[1])}
-        r="4"
-        class="start"
-      />
-      <circle data-end cx={plotX(end[0])} cy={plotY(end[1])} r="5" class="end" />
+      <circle cx={plotX(1)} cy={plotY(0)} r="7" class="minimum"></circle>
+      <circle cx={plotX(0)} cy={plotY(1)} r="7" class="minimum"></circle>
+      <path data-path d={descentPath(points)} class="trajectory"></path>
+      <circle data-start cx={plotX(initial[0])} cy={plotY(initial[1])} r="4" class="start"
+      ></circle>
+      <circle data-end cx={plotX(end[0])} cy={plotY(end[1])} r="5" class="end"></circle>
     </svg>
     <div class="key" aria-hidden="true">
       <span><i class="start-key"></i>初始点</span>
@@ -89,7 +89,8 @@ const controls = [
         controls.map((control) => (
           <label>
             <span>
-              {control.label}<b data-value={control.key}>{control.value}</b>
+              {control.label}
+              <b data-value={control.key}>{control.value}</b>
             </span>
             <input
               type="range"
