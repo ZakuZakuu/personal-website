@@ -231,6 +231,10 @@ over generic textbook explanations.
 
 # AI Writing Workflow
 
+Before creating or revising site content, read [docs/AUTHORING.md](docs/AUTHORING.md), including its guidance on figures, interactive examples, and validation. For learning notes, look for useful source figures or data that can be plotted, and assess whether an interactive example would improve understanding, preserve useful interactions from the source material, and reuse existing components where appropriate. If no interaction is suitable, explain why in the PR. Follow the guide for implementation and verification.
+
+The repository also provides [skills/personal-writing/SKILL.md](skills/personal-writing/SKILL.md) for explicitly invoked personal-writing workflows.
+
 The intended content workflow is conversational.
 
 Ryan may ask AI to turn previous discussions into:
@@ -293,7 +297,7 @@ Do not add metadata fields without an actual use case.
 
 # File Organization
 
-Prefer colocating content-specific assets with their content.
+Colocate note-specific assets, interactive components, and supporting code with their content under `src/content/notes/<slug>/`. Keep reusable site components in `src/components/`. See [Interactive examples](docs/AUTHORING.md#interactive-examples).
 
 Good:
 

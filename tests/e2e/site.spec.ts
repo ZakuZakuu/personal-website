@@ -228,3 +228,35 @@ test('mobile navigation exposes every primary destination', async ({ page, isMob
   await expect(navigation).toBeVisible();
   await expect(navigation.getByRole('link')).toHaveCount(5);
 });
+
+test('project note visualizes the direction of computation and the optimizer update', async ({ page }) => {
+  const response = await page.goto('/writing/dda5001-final-project-part1/');
+  expect(response?.ok()).toBeTruthy();
+  const example = page.getByRole('group', { name: '沿计算图走完一次 SGD 更新' });
+  const forward = example.locator('[data-panel="forward"]');
+  const backward = example.locator('[data-panel="backward"]');
+  await expect(forward.locator('.loss')).toContainText('16');
+  await expect(forward.locator('.edges').first()).toHaveText(/↘/);
+  const trigger = example.getByRole('button', { name: 'backward()' });
+  await expect(trigger).toBeEnabled();
+  await trigger.focus();
+  await page.keyboard.press('Enter');
+  await expect(trigger).toHaveAttribute('aria-pressed', 'true');
+  await expect(backward.locator('.edges').first()).toHaveText(/↖/);
+  await expect(backward.locator('.readout')).toContainText('w.grad = -16');
+  await expect(backward.locator('.readout')).toContainText('w = 1，b = 1');
+  await example.getByRole('button', { name: 'optimizer.step()' }).click();
+  await expect(example.locator('[data-panel="step"] .readout')).toContainText('w = 2.6，b = 1.8');
+  await example.getByRole('button', { name: 'zero_grad()' }).click();
+  await expect(example.locator('[data-panel="zero"] .readout')).toContainText('w.grad = None');
+  await expect(page.locator('.prose .katex-error')).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth))
+    .toBeLessThanOrEqual(await page.evaluate(() => document.documentElement.clientWidth + 1));
+});
+
+test('DDA5001 project note loads its measured optimizer curves', async ({ page }) => {
+  await page.goto('/writing/dda5001-final-project-part1/');
+  const plot = page.getByRole('img', { name: /^六组优化器实验的四面板曲线/ });
+  await plot.scrollIntoViewIfNeeded();
+  await expect.poll(() => plot.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
+});

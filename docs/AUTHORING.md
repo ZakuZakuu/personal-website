@@ -33,6 +33,7 @@ skills/personal-writing/references/site-authoring.md，再开始写作。
 - 写作前先判断语料校准的可信度；没有足够的本人原文时，只把风格判断当作暂时假设，不要声称已经完成稳定的文风复刻；
 - 写完后按 style-audit.md 做一次受控检查，只修改有材料依据的 AI 痕迹，不要机械删掉所有对比句、破折号或问句；
 - 不确定或材料不足的地方不要编造，直接标出来；
+- 整理学习笔记或作业复盘时，初稿就把能帮助理解的原图放到相关正文旁边；有数据且图表能说明问题时，可用 AI 辅助整理数据并用 Matplotlib 等工具绘图，再核对图上的数值和单位；
 - 整理学习笔记或作业复盘时，优先将适合动手验证的公式、优化轨迹和算法行为转成 Generative UI，复用或新增轻量 Astro 组件，按本指南的 Interactive examples 验证；如果不适合交互，说明原因；
 - 按默认流程创建独立分支、完成校验并开一个指向 main 的审阅 PR；不要合并 PR。
 
@@ -62,13 +63,17 @@ Each command creates a conservative template and refuses to overwrite an existin
 
 ## Assets
 
+Plan figures during the first draft of a learning note. Review the supplied material for experiment plots, screenshots, diagrams, and reusable course figures. Use a source figure when it supports the explanation, check it matches the example or run, and credit its source when appropriate. Place it beside the first passage that discusses it.
+
+When the data supports a useful comparison or trend and a suitable figure is missing, use Matplotlib or a similar plotting library to produce a static chart. AI can help inspect the data and write the plotting code. Check the plotted values, labels, and units against the source before embedding it. Write a caption that helps the reader connect the figure to the passage.
+
 Give content-specific assets descriptive names and keep them beside the content they support. Import images from MDX and render them with `MediaFigure.astro` so dimensions, lazy loading, alt text, and captions remain consistent. Use `VideoFigure.astro` for local or hosted video; always provide a useful title and poster when available.
 
 ## Interactive examples
 
-Generative UI is the preferred default for learning notes when interaction adds understanding. During drafting, check for adjustable formulas, geometric intuition, optimization trajectories, algorithm steps, thresholds, and predictions. Preserve useful interactive examples from the source conversation. Reuse an existing Astro component when possible; otherwise implement a focused reusable component using static Astro markup and local browser computation. Keep the original reasoning, formula, or worked example alongside it. Do not force an interaction into notes that are better served by static prose; explain that decision in the PR.
+Generative UI is the preferred default for learning notes when interaction adds understanding. During drafting, check for adjustable formulas, geometric intuition, optimization trajectories, algorithm steps, thresholds, and predictions. Preserve useful interactive examples from the source conversation. Make the concept visible in the interaction. For a computation graph, show nodes, dependencies, and the direction of values or gradients. For an experiment, plot the measured values and let controls change the comparison. Use text to label the visual and explain what changed. Design the interaction around the learning question in the note. Default to a focused component colocated with the note when its example is specific to that entry. Reuse shared components when they fit the example and teach the intended concept. Keep the original reasoning, formula, or worked example alongside it. Do not force an interaction into notes that are better served by static prose; explain that decision in the PR.
 
-Use `.mdx` and prefer a reviewed Astro component. For example, import `BatchAccumulation` from `../../components/BatchAccumulation.astro` in a note at `src/content/notes/`, then insert `<BatchAccumulation microBatch={256} steps={4} />`. Use inputs and expected results grounded in the source. For a course exercise, apply the course's rules before including the prompt, solution, or test data in a public entry.
+For a note-specific visual, place `index.mdx`, its Astro component, and any supporting data or calculation code together under `src/content/notes/<slug>/`. Only the MDX file is a content entry. Shared components used across notes belong in `src/components/`. Use `.mdx` and prefer a reviewed Astro component. For example, import `BatchAccumulation` from `../../components/BatchAccumulation.astro` in a note at `src/content/notes/`, then insert `<BatchAccumulation microBatch={256} steps={4} />`. Use inputs and expected results grounded in the source. For a course exercise, apply the course's rules before including the prompt, solution, or test data in a public entry.
 
 For a new component, keep calculation logic testable and the initial example usable without JavaScript. Add unit tests for the model and browser tests for representative interactions, including a meaningful boundary or counterexample. Preview the rendered article and check that readers can use the interaction on a narrow screen and with a keyboard. Avoid new dependencies, model calls, or server infrastructure for these examples. See [the Generative UI design note](research/generative-ui.md).
 
