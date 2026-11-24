@@ -1,5 +1,5 @@
 ---
-title: 'DDA5001 Final Project Part I：从字符预测到优化器比较'
+title: 'DDA5001 Final Project Part I：训练 loss 降低，验证 loss 为什么回升？'
 description: 用莎士比亚文本预训练字符级 GPT，梳理错位标签、因果掩码和训练循环，并回看六组优化器实验。
 date: 2026-11-24
 tags: [DDA5001, machine-learning, optimization, transformer]
@@ -7,7 +7,7 @@ course: DDA5001
 related: [dda5001-hw1-review, dda5001-hw2-review, dda5001-hw3-review]
 ---
 
-import BatchAccumulation from '../../components/BatchAccumulation.astro';
+import GradientWalkthrough from '../../components/GradientWalkthrough.astro';
 
 看过 Transformer 的结构，不代表能立刻把它和一次训练过程对上。这次 Part I 从莎士比亚文本出发，训练字符级 GPT，比较 SGDM、AdamW 和 Muon。复习时我最想弄清楚的是：输入和标签到底长什么样？熟悉的三角形 mask 加在哪里？为什么训练 loss 很低，验证 loss 却越来越高？
 
@@ -119,6 +119,16 @@ Muon 的 `adjust_lr_fn='original'` 使用原始实现的矩阵形状相关学习
 
 例如 $\\hat y=wx+b$、$L=(\\hat y-y)^2$，链式法则给出 $\\partial L/\\partial w=2(\\hat y-y)x$。实际 Transformer 的计算图更大、张量维度更多，但基本思路相同。`backward()` 算完梯度不会更新参数；`step()` 才按所选算法使用梯度更新参数。清除 `.grad` 也不会清除 AdamW 的矩估计或 SGDM 的动量。
 
+### 从计算图到更新
+
+**反向传播把 loss 对各参数的梯度算出来；更新参数是下一步。** 下面是我们讨论过的简化例子，不是 GPT 中的真实参数：$x=2$、$y=7$、$w=b=1$，平方误差为 $(wx+b-y)^2$。点击步骤，观察计算图和参数、梯度的变化。这里的更新使用无动量 SGD，只为展示 API 分工。
+
+<GradientWalkthrough />
+
+前向结果为 $\hat y=3$、$L=16$。链式法则先得到 $\partial L/\partial \hat y=-8$，再得到 $\partial L/\partial w=-16$、$\partial L/\partial b=-8$。学习率为 0.1 时，一次 SGD 更新得到 $w=2.6$、$b=1.8$。计算图若有分支，多条路径对同一个参数的梯度贡献会相加。
+
+**易混点**：`zero_grad()` 重置优化器管理的参数的梯度，不会清除 AdamW 的动量状态；`backward()` 累积梯度，通常不会更新参数；`step()` 更新参数，通常不会自动清除梯度。
+
 ### 梯度累积
 
 当大 batch 放不进显存，可以拆成多个 micro-batch：先清除梯度，逐个前向和反向，把梯度累积起来，最后更新一次。如果每个 micro-batch 的有效 token 数相同，且其 loss 是 token 平均值，可以这样写：
@@ -131,10 +141,6 @@ for x_micro, y_micro in micro_batches:
     (loss / len(micro_batches)).backward()
 optimizer.step()
 ```
-
-下面复用站内的试算器：以每个 micro-batch 64 条、累积 2 次为演示；这不是本次实验实际使用的 72 和 1。
-
-<BatchAccumulation microBatch={64} steps={2} />
 
 因为求导是线性的，每个平均 loss 除以 micro-batch 数量后再反向，累积得到的是这些梯度的平均值。不除时得到的是梯度之和，尺度会不同。若各 micro-batch 的有效 token 数不同，应按有效 token 数加权，而不是简单给每个 micro-batch 相同权重。
 

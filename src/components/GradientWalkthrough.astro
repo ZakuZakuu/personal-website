@@ -1,0 +1,59 @@
+---
+import { initialExample } from '../lib/gradient-walkthrough.ts';
+const initial = initialExample();
+---
+
+<gradient-walkthrough>
+  <fieldset>
+    <legend>一次前向、反向与参数更新</legend>
+    <p>简化示例：x = 2，y = 7，loss = (wx + b − y)²；无动量 SGD，学习率 0.1。</p>
+    <p>计算图：w、x → 乘法 → 加 b → 预测 → 平方误差 → loss</p>
+    <div class="controls">
+      <button type="button" data-action="zero">zero_grad()</button>
+      <button type="button" data-action="forward" disabled>前向计算</button>
+      <button type="button" data-action="backward" disabled>backward()</button>
+      <button type="button" data-action="step" disabled>step()</button>
+      <button type="button" data-action="reset">重置</button>
+    </div>
+    <output aria-live="polite" data-result>{initial.message}</output>
+    <noscript>示例：前向得到预测 3、loss 16；梯度为 −16、−8；SGD 更新后 w = 2.6，b = 1.8。</noscript>
+  </fieldset>
+</gradient-walkthrough>
+
+<script>
+  import { initialExample, advanceExample } from '../lib/gradient-walkthrough.ts';
+  class GradientWalkthrough extends HTMLElement {
+    connectedCallback() {
+      let state = initialExample();
+      const output = this.querySelector<HTMLOutputElement>('[data-result]');
+      const buttons = this.querySelectorAll<HTMLButtonElement>('button[data-action]');
+      const render = () => {
+        if (output) output.textContent = state.message;
+        buttons.forEach((button) => {
+          const action = button.dataset.action;
+          button.disabled = action !== 'reset' && action !== state.next;
+        });
+      };
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const action = button.dataset.action;
+          if (action === 'reset') state = initialExample();
+          else if (action === state.next) state = advanceExample(state);
+          render();
+        });
+      });
+      render();
+    }
+  }
+  customElements.define('gradient-walkthrough', GradientWalkthrough);
+</script>
+
+<style>
+  gradient-walkthrough { display: block; margin-block: 2rem; font-family: var(--font-sans); }
+  fieldset { min-inline-size: 0; padding: 1rem; border: 1px solid var(--line); background: var(--paper-raised); }
+  legend { padding-inline: 0.4rem; font-weight: 650; }
+  .controls { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block: 1rem; }
+  button { min-height: 2.75rem; padding: 0.5rem; border: 1px solid var(--ink-soft); color: var(--ink); background: var(--paper); font: inherit; }
+  button:disabled { opacity: 0.5; }
+  output { display: block; overflow-wrap: anywhere; }
+</style>

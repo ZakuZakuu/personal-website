@@ -228,3 +228,19 @@ test('mobile navigation exposes every primary destination', async ({ page, isMob
   await expect(navigation).toBeVisible();
   await expect(navigation.getByRole('link')).toHaveCount(5);
 });
+
+test('project note walks through gradient and parameter update', async ({ page }) => {
+  await page.goto('/writing/dda5001-final-project-part1/');
+  const example = page.getByRole('group', { name: '一次前向、反向与参数更新' });
+  await expect(example.getByRole('button', { name: 'backward()' })).toBeDisabled();
+  await example.getByRole('button', { name: 'zero_grad()' }).click();
+  await example.getByRole('button', { name: '前向计算' }).click();
+  await expect(example.locator('output')).toContainText('loss = 16');
+  await example.getByRole('button', { name: 'backward()' }).click();
+  await expect(example.locator('output')).toContainText('w.grad = -16');
+  await example.getByRole('button', { name: 'step()' }).click();
+  await expect(example.locator('output')).toContainText('w = 2.6，b = 1.8');
+  await example.getByRole('button', { name: '重置' }).click();
+  await expect(example.locator('output')).toContainText('w = 1，b = 1');
+  await expect(page.locator('.prose .katex-error')).toHaveCount(0);
+});
