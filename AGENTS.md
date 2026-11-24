@@ -297,7 +297,7 @@ Do not add metadata fields without an actual use case.
 
 # File Organization
 
-Prefer colocating content-specific assets with their content.
+Colocate note-specific assets, interactive components, and supporting code with their content under `src/content/notes/<slug>/`. Keep reusable site components in `src/components/`. See [Interactive examples](docs/AUTHORING.md#interactive-examples).
 
 Good:
 

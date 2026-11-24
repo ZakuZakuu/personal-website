@@ -229,18 +229,27 @@ test('mobile navigation exposes every primary destination', async ({ page, isMob
   await expect(navigation.getByRole('link')).toHaveCount(5);
 });
 
-test('project note walks through gradient and parameter update', async ({ page }) => {
-  await page.goto('/writing/dda5001-final-project-part1/');
-  const example = page.getByRole('group', { name: '一次前向、反向与参数更新' });
-  await expect(example.getByRole('button', { name: 'backward()' })).toBeDisabled();
+test('project note visualizes the direction of computation and the optimizer update', async ({ page }) => {
+  const response = await page.goto('/writing/dda5001-final-project-part1/');
+  expect(response?.ok()).toBeTruthy();
+  const example = page.getByRole('group', { name: '沿计算图走完一次 SGD 更新' });
+  const forward = example.locator('[data-panel="forward"]');
+  const backward = example.locator('[data-panel="backward"]');
+  await expect(forward.locator('.loss')).toContainText('16');
+  await expect(forward.locator('.edges').first()).toHaveText(/↘/);
+  const trigger = example.getByRole('button', { name: 'backward()' });
+  await expect(trigger).toBeEnabled();
+  await trigger.focus();
+  await page.keyboard.press('Enter');
+  await expect(trigger).toHaveAttribute('aria-pressed', 'true');
+  await expect(backward.locator('.edges').first()).toHaveText(/↖/);
+  await expect(backward.locator('.readout')).toContainText('w.grad = -16');
+  await expect(backward.locator('.readout')).toContainText('w = 1，b = 1');
+  await example.getByRole('button', { name: 'optimizer.step()' }).click();
+  await expect(example.locator('[data-panel="step"] .readout')).toContainText('w = 2.6，b = 1.8');
   await example.getByRole('button', { name: 'zero_grad()' }).click();
-  await example.getByRole('button', { name: '前向计算' }).click();
-  await expect(example.locator('output')).toContainText('loss = 16');
-  await example.getByRole('button', { name: 'backward()' }).click();
-  await expect(example.locator('output')).toContainText('w.grad = -16');
-  await example.getByRole('button', { name: 'step()' }).click();
-  await expect(example.locator('output')).toContainText('w = 2.6，b = 1.8');
-  await example.getByRole('button', { name: '重置' }).click();
-  await expect(example.locator('output')).toContainText('w = 1，b = 1');
+  await expect(example.locator('[data-panel="zero"] .readout')).toContainText('w.grad = None');
   await expect(page.locator('.prose .katex-error')).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth))
+    .toBeLessThanOrEqual(await page.evaluate(() => document.documentElement.clientWidth + 1));
 });

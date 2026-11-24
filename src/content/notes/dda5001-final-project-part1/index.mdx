@@ -7,7 +7,7 @@ course: DDA5001
 related: [dda5001-hw1-review, dda5001-hw2-review, dda5001-hw3-review]
 ---
 
-import GradientWalkthrough from '../../components/GradientWalkthrough.astro';
+import GradientWalkthrough from './GradientWalkthrough.astro';
 
 看过 Transformer 的结构，不代表能立刻把它和一次训练过程对上。这次 Part I 从莎士比亚文本出发，训练字符级 GPT，比较 SGDM、AdamW 和 Muon。复习时我最想弄清楚的是：输入和标签到底长什么样？熟悉的三角形 mask 加在哪里？为什么训练 loss 很低，验证 loss 却越来越高？
 
@@ -121,7 +121,7 @@ Muon 的 `adjust_lr_fn='original'` 使用原始实现的矩阵形状相关学习
 
 ### 从计算图到更新
 
-**反向传播把 loss 对各参数的梯度算出来；更新参数是下一步。** 下面是我们讨论过的简化例子，不是 GPT 中的真实参数：$x=2$、$y=7$、$w=b=1$，平方误差为 $(wx+b-y)^2$。点击步骤，观察计算图和参数、梯度的变化。这里的更新使用无动量 SGD，只为展示 API 分工。
+**反向传播把 loss 对各参数的梯度算出来；更新参数是下一步。** 下面是我们讨论过的简化例子，不是 GPT 中的真实参数：$x=2$、$y=7$、$w=b=1$，平方误差为 $(wx+b-y)^2$。先看数值顺着箭头流到 loss，再切换到 `backward()`，沿反向箭头找出梯度如何分给 `w` 和 `b`。切到 `optimizer.step()` 后，对照本轮前向图里的旧值与下方的当前参数。这里的更新使用无动量 SGD，只为展示 API 分工。
 
 <GradientWalkthrough />
 

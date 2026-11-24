@@ -1,0 +1,122 @@
+---
+import { phases, workedExample } from './gradient-walkthrough.ts';
+
+const steps = ['zero_grad()', '前向计算', 'backward()', 'optimizer.step()'];
+---
+
+<gradient-walkthrough>
+  <fieldset>
+    <legend>沿计算图走完一次 SGD 更新</legend>
+    <div class="controls">
+      {phases.map((phase, index) => (
+        <button type="button" data-phase={phase} aria-pressed={phase === 'forward'} disabled>
+          {steps[index]}
+        </button>
+      ))}
+    </div>
+    {phases.map((phase) => {
+      const value = workedExample(phase);
+      const backward = phase === 'backward';
+      const hasForward = phase !== 'zero';
+      const updated = phase === 'step';
+
+      return (
+        <div class:list={['phase', { backward, updated }]} data-panel={phase} hidden={phase !== 'forward'}>
+          <p class="direction">
+            {backward
+              ? '↑ 梯度从 loss 往回传，分支再传给 w 和 b'
+              : updated
+                ? '参数更新后，图中仍是本轮前向的旧值'
+                : phase === 'forward'
+                  ? '↓ 数值沿箭头流向 loss'
+                  : '准备下一轮，梯度设为 None'}
+          </p>
+          <div class="graph" aria-label="平方误差计算图">
+            <div class="sources">
+              <div class="node"><code>w = 1</code>{backward && <small>梯度 {value.weightGradient}</small>}</div>
+              <div class="node"><code>x = 2</code><small>输入</small></div>
+            </div>
+            <div class="edges" aria-hidden="true">{backward ? '↖　↗' : '↘　↙'}</div>
+            <div class="node main"><span>乘法 · wx</span><code>{hasForward ? value.product : '—'}</code></div>
+            <div class="edges" aria-hidden="true">{backward ? '↑' : '↓'}</div>
+            <div class="node main">
+              <span>预测 · wx + b</span><code>{hasForward ? value.prediction : '—'}</code>
+              {backward && <small>梯度 {value.predictionGradient}</small>}
+            </div>
+            <span class="edge side bias-edge" aria-hidden="true">{backward ? '→' : '←'}</span>
+            <div class="node side bias"><code>b = 1</code>{backward && <small>梯度 {value.biasGradient}</small>}</div>
+            <div class="edges" aria-hidden="true">{backward ? '↑' : '↓'}</div>
+            <div class="node main"><span>误差 · 预测 − y</span><code>{hasForward ? value.residual : '—'}</code></div>
+            <span class="edge side target-edge" aria-hidden="true">{backward ? '·' : '←'}</span>
+            <div class="node side target"><code>y = 7</code><small>标签</small></div>
+            <div class="edges" aria-hidden="true">{backward ? '↑' : '↓'}</div>
+            <div class="node main loss"><span>平方误差 · loss</span><code>{hasForward ? value.loss : '—'}</code></div>
+          </div>
+          <div class="readout">
+            <div><span>当前参数</span><code>w = {value.w}，b = {value.b}</code></div>
+            <div><span>参数上的梯度</span><code>w.grad = {value.weightGradient ?? 'None'}</code><code>b.grad = {value.biasGradient ?? 'None'}</code></div>
+          </div>
+        </div>
+      );
+    })}
+    <output class="sr-only" aria-live="polite"></output>
+  </fieldset>
+</gradient-walkthrough>
+
+<script>
+  class GradientWalkthrough extends HTMLElement {
+    connectedCallback() {
+      const buttons = Array.from(this.querySelectorAll<HTMLButtonElement>('[data-phase]'));
+      const panels = this.querySelectorAll<HTMLElement>('[data-panel]');
+      const announcement = this.querySelector('output');
+      buttons.forEach((button) => {
+        button.disabled = false;
+        button.onclick = () => {
+          buttons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+          panels.forEach((panel) => {
+            panel.hidden = panel.dataset.panel !== button.dataset.phase;
+            if (!panel.hidden && announcement) {
+              announcement.textContent = panel.querySelector('.readout')?.textContent ?? '';
+            }
+          });
+        };
+      });
+    }
+  }
+  customElements.define('gradient-walkthrough', GradientWalkthrough);
+</script>
+
+<style>
+  gradient-walkthrough { display: block; margin-block: 1.75rem; font-family: var(--font-sans); font-size: 0.9rem; }
+  fieldset { min-inline-size: 0; padding: clamp(0.5rem, 3vw, 1.1rem); border: 1px solid var(--line); background: var(--paper-raised); }
+  legend { padding-inline: 0.4rem; font-weight: 650; }
+  .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5rem), 1fr)); gap: 0.4rem; }
+  button { min-height: 2.75rem; padding: 0.35rem; overflow-wrap: anywhere; border: 1px solid var(--ink-soft); color: var(--ink); background: var(--paper); font: inherit; }
+  button[aria-pressed='true'] { border-color: var(--accent); box-shadow: inset 0 -3px var(--accent); font-weight: 650; }
+  .phase[hidden] { display: none; }
+  .direction { margin: 0.75rem 0; text-align: center; }
+  .graph { display: grid; grid-template-columns: minmax(0, 2fr) 1.25rem minmax(0, 1fr); align-items: center; max-width: 25rem; margin-inline: auto; line-height: 1.35; }
+  .sources { grid-area: 1 / 1; display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+  .main, .edges { grid-column: 1; }
+  .sources + .edges { grid-row: 2; }
+  .sources + .edges + .main { grid-row: 3; }
+  .graph > :nth-child(4) { grid-row: 4; }
+  .graph > :nth-child(5) { grid-row: 5; }
+  .graph > :nth-child(8) { grid-row: 6; }
+  .graph > :nth-child(9) { grid-row: 7; }
+  .graph > :nth-child(12) { grid-row: 8; }
+  .loss { grid-row: 9; }
+  .node { min-inline-size: 0; padding: 0.35rem; border: 1px solid var(--line); background: var(--paper); text-align: center; overflow-wrap: anywhere; }
+  .node code, .node small { display: block; }
+  .edge, .edges { color: var(--ink); text-align: center; font-weight: 650; }
+  .bias-edge { grid-area: 5 / 2; }
+  .bias { grid-area: 5 / 3; }
+  .target-edge { grid-area: 7 / 2; }
+  .target { grid-area: 7 / 3; }
+  .loss, .backward .node:has(small):not(.target) { border-color: var(--accent); }
+  .backward .edges, .backward .bias-edge { color: var(--accent); }
+  .readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: 0.45rem; margin-top: 0.75rem; }
+  .readout div { padding: 0.5rem; border: 1px solid var(--line); }
+  .readout span, .readout code { display: block; overflow-wrap: anywhere; }
+  .updated .readout div:first-child { border-color: var(--accent); }
+</style>
