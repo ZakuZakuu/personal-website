@@ -7,7 +7,9 @@ course: DDA5001
 related: [dda5001-hw1-review, dda5001-hw2-review, dda5001-hw3-review]
 ---
 
+import MediaFigure from '../../../components/MediaFigure.astro';
 import GradientWalkthrough from './GradientWalkthrough.astro';
+import trainingLossCurves from './optimizer-loss-curves.webp';
 
 看过 Transformer 的结构，不代表能立刻把它和一次训练过程对上。这次 Part I 从莎士比亚文本出发，训练字符级 GPT，比较 SGDM、AdamW 和 Muon。复习时我最想弄清楚的是：输入和标签到底长什么样？熟悉的三角形 mask 加在哪里？为什么训练 loss 很低，验证 loss 却越来越高？
 
@@ -161,7 +163,13 @@ optimizer.step()
 | SGDM | 0.1 | 1.6573 | 25.85 |
 | SGDM | 0.05 | 1.5490 | 26.06 |
 
-AdamW 和 Muon 的训练 loss 下降很快，最终接近 0；但验证 loss 先下降，随后明显上升。这与过拟合一致：模型继续拟合训练数据，却没有继续改善未参与参数更新的验证数据。AdamW 减半学习率使终点验证 loss 从 4.0327 降到 3.8108，但没有消除后期回升；Muon 减半后终点略高。SGDM 的训练 loss 下降较慢，终点验证 loss 较低。
+<MediaFigure
+  src={trainingLossCurves}
+  alt="六组优化器实验的四面板曲线。上排为训练 loss，下排为验证 loss。左列按累计预测 token，右列按训练时间。AdamW 与 Muon 的训练 loss 持续下降，验证 loss 后期回升。"
+  caption="六组实测曲线。上排是训练 loss，下排是验证 loss。左列按累计预测 token 比较，右列按训练分钟比较。实线为默认峰值学习率，虚线为减半设置。"
+/>
+
+对照左列的上下两张图，可以看到同样处理了多少 token 时，训练和验证表现如何分开。AdamW 和 Muon 的训练 loss 下降很快，最终接近 0；但验证 loss 先下降，随后明显上升。这与过拟合一致：模型继续拟合训练数据，却没有继续改善未参与参数更新的验证数据。AdamW 减半学习率使终点验证 loss 从 4.0327 降到 3.8108，但没有消除后期回升；Muon 减半后终点略高。SGDM 的训练 loss 下降较慢，终点验证 loss 较低。
 
 我一开始怀疑 AdamW 的二阶矩直接导致过拟合，尤其 Muon 组也包含辅助 AdamW。但这些运行同时改变了整个优化方法，不能把差异单独归因于二阶矩。一个合理的解释是：AdamW 和 Muon 在本次设置下更快拟合训练集，也更早进入验证表现恶化的阶段；这仍是根据曲线提出的解释，需要进一步实验才能判断原因。
 

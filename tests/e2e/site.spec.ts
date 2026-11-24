@@ -253,3 +253,10 @@ test('project note visualizes the direction of computation and the optimizer upd
   expect(await page.evaluate(() => document.documentElement.scrollWidth))
     .toBeLessThanOrEqual(await page.evaluate(() => document.documentElement.clientWidth + 1));
 });
+
+test('DDA5001 project note loads its measured optimizer curves', async ({ page }) => {
+  await page.goto('/writing/dda5001-final-project-part1/');
+  const plot = page.getByRole('img', { name: /^六组优化器实验的四面板曲线/ });
+  await plot.scrollIntoViewIfNeeded();
+  await expect.poll(() => plot.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
+});
