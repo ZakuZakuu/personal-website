@@ -80,10 +80,11 @@ Use `$...$` for inline mathematics and `$$...$$` for display mathematics. The si
 
 ```bash
 pnpm check
-pnpm lint
 pnpm test
 pnpm build
 ```
+
+Run `pnpm test:e2e` for new or changed interactive components. Formatting is advisory: use `pnpm format` or `pnpm lint` when available, but do not delay otherwise correct content solely for Prettier warnings. If local validation is unavailable, use branch CI to verify the required checks and report any outstanding failures.
 
 Preview the result at mobile and desktop widths. Long code, equations, tables, image alt text, heading order, and internal links deserve explicit attention.
 

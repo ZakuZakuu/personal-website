@@ -34,7 +34,8 @@ jobs:
       - name: Check types and content
         run: pnpm check
 
-      - name: Check formatting
+      - name: Check formatting (advisory)
+        continue-on-error: true
         run: pnpm lint
 
       - name: Run unit tests

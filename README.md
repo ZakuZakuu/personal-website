@@ -74,7 +74,7 @@ pnpm media:social-card
 
 Important trade-offs are recorded in [docs/DECISIONS.md](docs/DECISIONS.md).
 
-GitHub Actions repeats the type/content checks, formatting check, unit tests, production build, desktop/mobile browser tests, and Axe accessibility audit on pushes and pull requests.
+GitHub Actions runs type/content checks, unit tests, the production build, desktop/mobile browser tests, and Axe accessibility checks on pushes and pull requests. Prettier formatting is advisory: a formatting failure does not block the remaining checks or publication. Use `pnpm format` to clean up formatting when convenient.
 
 ## Before publishing new content
 

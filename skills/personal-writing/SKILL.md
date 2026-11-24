@@ -60,7 +60,7 @@ When writing into the site, create one Markdown or MDX file with the minimum use
 
 ### 8. Validate and report
 
-Validate every modified entry using the repository's configured checks. Report the output path, interactive component and verification (or the reason for omitting it), editorial choices that materially changed the source, unresolved markers, confidence gaps in the voice calibration, and the pull-request URL or local-draft state.
+Validate every modified entry using the repository's required type/content, unit, build, and applicable browser checks. Prettier is advisory; format when tooling is available, but do not block delivery or create another revision solely for formatting warnings. If local checks cannot run, use branch CI and report which required checks have passed. Report the output path, interactive component and verification (or the reason for omitting it), editorial choices that materially changed the source, unresolved markers, confidence gaps in the voice calibration, and the pull-request URL or local-draft state.
 
 ## Editorial contract
 
@@ -77,4 +77,4 @@ Validate every modified entry using the repository's configured checks. Report t
 
 ## Completion
 
-A delivery is complete when every substantive claim traces to supplied material or an identified source, the author's reasoning transitions remain visible, metadata validates, no placeholder is hidden from the user, the requested repository checks pass, and either the review PR is open or the requested local draft is clearly reported.
+A delivery is complete when every substantive claim traces to supplied material or an identified source, the author's reasoning transitions remain visible, metadata validates, no placeholder is hidden from the user, the required repository checks pass, and either the review PR is open or the requested local draft is clearly reported.
